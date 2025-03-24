@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Форма рекламації</title>
+    <title>Форма рекламации</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -46,29 +46,95 @@
             background-color: #3a3a5e;
             color: #ffffff;
             font-size: 14px;
+            box-sizing: border-box;
         }
         input[type="date"] {
-            color: #cccccc;
+            color: #888888;
+        }
+        input[type="date"]:valid {
+            color: #ffffff;
+        }
+        input::placeholder, textarea::placeholder, select:invalid {
+            color: #888888;
+            font-style: italic;
+        }
+        select {
+            color: #888888;
+        }
+        select:valid {
+            color: #ffffff;
         }
         textarea {
             height: 80px;
             resize: none;
         }
+        .row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .row > div {
+            flex: 1;
+        }
+        .row input {
+            width: 100%;
+        }
+        /* Стили для кастомного поля загрузки файла */
+        .file-upload {
+            position: relative;
+            margin-bottom: 15px;
+        }
+        .file-upload input[type="file"] {
+            display: none;
+        }
+        .file-upload-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .file-upload-button {
+            padding: 8px 10px; /* Уменьшен padding для компактности */
+            background: linear-gradient(90deg, #bb86fc, #6200ea);
+            border: none;
+            border-radius: 15px;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            white-space: nowrap;
+            display: inline-block;
+        }
+        .file-upload-button:hover {
+            background: linear-gradient(90deg, #a76de8, #4b00b8);
+        }
+        .file-status {
+            color: #888888;
+            font-size: 14px;
+            font-style: italic;
+        }
+        .file-status.selected {
+            color: #ffffff;
+            font-style: normal;
+        }
+        /* Стили для кнопки "Відправити" */
         button {
             width: 100%;
-            padding: 10px;
-            background-color: #bb86fc;
+            padding: 12px;
+            background: linear-gradient(90deg, #bb86fc, #6200ea);
             border: none;
-            border-radius: 5px;
+            border-radius: 25px;
             color: #ffffff;
             font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            transition: background 0.3s ease;
         }
         button:hover {
-            background-color: #a76de8;
+            background: linear-gradient(90deg, #a76de8, #4b00b8);
         }
         .arrow {
             font-size: 20px;
@@ -80,14 +146,28 @@
         <h2>Форма рекламації</h2>
         <p>Будь ласка, заповніть усі поля форми для обробки вашої рекламації</p>
         <form id="complaintForm" onsubmit="handleSubmit(event)">
+            <label for="barcodePhoto">Фото ШК</label>
+            <div class="file-upload">
+                <input type="file" id="barcodePhoto" accept="image/*" required>
+                <div class="file-upload-label">
+                    <button type="button" class="file-upload-button" onclick="document.getElementById('barcodePhoto').click()">Виберіть файл</button>
+                    <span class="file-status" id="fileStatus">Файл не вибраний</span>
+                </div>
+            </div>
+
             <label for="fullName">ПІБ</label>
             <input type="text" id="fullName" placeholder="Іванов Іван Іванович" required>
 
-            <label for="email">Email</label>
-            <input type="email" id="email" placeholder="example@email.com" required>
-
-            <label for="phone">Телефон</label>
-            <input type="tel" id="phone" placeholder="+380 (123) 456-7890" required>
+            <div class="row">
+                <div>
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="example@email.com" required>
+                </div>
+                <div>
+                    <label for="phone">Телефон</label>
+                    <input type="tel" id="phone" placeholder="+380 (123) 456-7890" required>
+                </div>
+            </div>
 
             <label for="productType">Тип продукту</label>
             <select id="productType" required>
@@ -98,25 +178,43 @@
                 <option value="other">Інше</option>
             </select>
 
-            <label for="purchaseDate">Дата покупки</label>
-            <input type="date" id="purchaseDate" required>
-
-            <label for="issueDate">Дата виявлення проблеми</label>
-            <input type="date" id="issueDate" required>
+            <div class="row">
+                <div>
+                    <label for="purchaseDate">Дата покупки</label>
+                    <input type="date" id="purchaseDate" required>
+                </div>
+                <div>
+                    <label for="issueDate">Дата виявлення проблеми</label>
+                    <input type="date" id="issueDate" required>
+                </div>
+            </div>
 
             <label for="description">Опис проблеми</label>
             <textarea id="description" placeholder="Детально опишіть проблему, що виникла..." required></textarea>
 
-            <button type="submit">Відправити рекламацію <span class="arrow">→</span></button>
+            <button type="submit">Відправити <span class="arrow">→</span></button>
         </form>
     </div>
 
     <script>
+        // Обновление статуса файла при выборе
+        document.getElementById('barcodePhoto').addEventListener('change', function() {
+            const fileStatus = document.getElementById('fileStatus');
+            if (this.files.length > 0) {
+                fileStatus.textContent = this.files[0].name;
+                fileStatus.classList.add('selected');
+            } else {
+                fileStatus.textContent = 'Файл не вибраний';
+                fileStatus.classList.remove('selected');
+            }
+        });
+
         function handleSubmit(event) {
             event.preventDefault();
 
             // Собираем данные из формы
             const formData = {
+                barcodePhoto: document.getElementById('barcodePhoto').files[0]?.name || 'Не выбрано',
                 fullName: document.getElementById('fullName').value,
                 email: document.getElementById('email').value,
                 phone: document.getElementById('phone').value,
@@ -131,6 +229,10 @@
 
             // Очищаем форму после отправки
             document.getElementById('complaintForm').reset();
+            // Сбрасываем статус файла
+            const fileStatus = document.getElementById('fileStatus');
+            fileStatus.textContent = 'Файл не вибраний';
+            fileStatus.classList.remove('selected');
 
             // Показываем уведомление об успешной отправке
             alert('Ваша рекламація успішно відправлена!');
