@@ -1,31 +1,95 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Тест камеры</title>
-    <meta name="referrer" content="no-referrer">
-    <meta http-equiv="Permissions-Policy" content="camera=(self)">
+    <title>QR Scanner</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://unpkg.com/jsqr/dist/jsQR.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        #video {
+            width: 100%;
+            max-width: 400px;
+            border: 2px solid #000;
+            display: block; /* Убеждаемся, что видео видно */
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-    <h2>📷 Проверка камеры</h2>
-    <button id="startButton">📸 Включить камеру</button>
-    <p id="status">Нажмите кнопку, чтобы дать доступ к камере.</p>
-    <video id="video" autoplay playsinline style="width: 100%; max-width: 600px; display: none;"></video>
+    <video id="video" autoplay playsinline></video>
+    <div id="result">Запускаю сканер...</div>
 
     <script>
-        document.getElementById("startButton").addEventListener("click", async () => {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-                const video = document.getElementById("video");
+        // Разворачиваем Mini App
+        window.Telegram.WebApp.expand();
+        window.Telegram.WebApp.ready(); // Сообщаем Telegram, что приложение готово
+
+        const video = document.getElementById('video');
+        const resultDiv = document.getElementById('result');
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+
+        // Функция для отображения ошибок
+        function showError(message) {
+            resultDiv.innerText = message;
+            console.error(message);
+        }
+
+        // Запуск камеры
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+            .then(stream => {
                 video.srcObject = stream;
-                video.style.display = "block";
-                document.getElementById("status").innerText = "✅ Камера работает!";
-            } catch (error) {
-                document.getElementById("status").innerText = "❌ Ошибка доступа: " + error.message;
-                console.error("Ошибка доступа к камере:", error);
-                alert("Разрешите доступ к камере в настройках устройства!");
+                video.onloadedmetadata = () => {
+                    video.play();
+                    resultDiv.innerText = 'Камера работает, сканую...';
+                    scanQRCode();
+                };
+            })
+            .catch(err => {
+                showError('Ошибка камеры: ' + err.message);
+            });
+
+        // Сканирование QR-кода
+        function scanQRCode() {
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+                if (code) {
+                    resultDiv.innerText = 'Найден QR: ' + code.data;
+                    window.Telegram.WebApp.sendData(code.data);
+                    video.srcObject.getTracks().forEach(track => track.stop());
+                    return; // Прерываем сканирование
+                }
+            } else {
+                resultDiv.innerText = 'Камера ещё не готова...';
             }
+            requestAnimationFrame(scanQRCode);
+        }
+
+        // Закрытие после отправки (опционально)
+        window.Telegram.WebApp.onEvent('dataSent', () => {
+            window.Telegram.WebApp.close();
         });
     </script>
 </body>
