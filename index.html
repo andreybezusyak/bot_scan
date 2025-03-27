@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Scanner</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://unpkg.com/jsqr/dist/jsQR.js"></script>
     <style>
         body {
@@ -22,7 +21,7 @@
             width: 100%;
             max-width: 400px;
             border: 2px solid #000;
-            display: block; /* Убеждаемся, что видео видно */
+            display: block;
         }
         #result {
             margin-top: 20px;
@@ -34,39 +33,29 @@
 </head>
 <body>
     <video id="video" autoplay playsinline></video>
-    <div id="result">Запускаю сканер...</div>
+    <div id="result">⏳ Запускаю камеру...</div>
 
     <script>
-        // Разворачиваем Mini App
-        window.Telegram.WebApp.expand();
-        window.Telegram.WebApp.ready(); // Сообщаем Telegram, что приложение готово
-
         const video = document.getElementById('video');
         const resultDiv = document.getElementById('result');
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
 
-        // Функция для отображения ошибок
-        function showError(message) {
-            resultDiv.innerText = message;
-            console.error(message);
-        }
-
-        // Запуск камеры
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-            .then(stream => {
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
                 video.srcObject = stream;
                 video.onloadedmetadata = () => {
                     video.play();
-                    resultDiv.innerText = 'Камера работает, сканую...';
+                    resultDiv.innerText = '✅ Камера работает, ищу QR...';
                     scanQRCode();
                 };
-            })
-            .catch(err => {
-                showError('Ошибка камеры: ' + err.message);
-            });
+            } catch (error) {
+                resultDiv.innerText = '❌ Ошибка камеры: ' + error.message;
+                console.error("Ошибка доступа к камере:", error);
+            }
+        }
 
-        // Сканирование QR-кода
         function scanQRCode() {
             if (video.readyState === video.HAVE_ENOUGH_DATA) {
                 canvas.width = video.videoWidth;
@@ -76,21 +65,22 @@
                 const code = jsQR(imageData.data, imageData.width, imageData.height);
 
                 if (code) {
-                    resultDiv.innerText = 'Найден QR: ' + code.data;
-                    window.Telegram.WebApp.sendData(code.data);
+                    resultDiv.innerText = '✅ Найден QR: ' + code.data;
                     video.srcObject.getTracks().forEach(track => track.stop());
-                    return; // Прерываем сканирование
+                    return;
                 }
             } else {
-                resultDiv.innerText = 'Камера ещё не готова...';
+                resultDiv.innerText = '⏳ Ожидание камеры...';
             }
             requestAnimationFrame(scanQRCode);
         }
 
-        // Закрытие после отправки (опционально)
-        window.Telegram.WebApp.onEvent('dataSent', () => {
-            window.Telegram.WebApp.close();
-        });
+        // Проверка поддержки камеры
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            startCamera();
+        } else {
+            resultDiv.innerText = "❌ Ваш браузер не поддерживает камеру!";
+        }
     </script>
 </body>
 </html>
