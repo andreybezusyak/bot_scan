@@ -22,38 +22,51 @@
             width: 100%;
             max-width: 400px;
             border: 2px solid #000;
+            display: block; /* Убеждаемся, что видео видно */
         }
         #result {
             margin-top: 20px;
             font-size: 18px;
             color: #333;
+            text-align: center;
         }
     </style>
 </head>
 <body>
     <video id="video" autoplay playsinline></video>
-    <div id="result">Сканирую...</div>
+    <div id="result">Запускаю сканер...</div>
 
     <script>
-        // Разворачиваем Mini App на всю высоту
+        // Разворачиваем Mini App
         window.Telegram.WebApp.expand();
+        window.Telegram.WebApp.ready(); // Сообщаем Telegram, что приложение готово
 
-        // Доступ к камере
         const video = document.getElementById('video');
         const resultDiv = document.getElementById('result');
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
 
+        // Функция для отображения ошибок
+        function showError(message) {
+            resultDiv.innerText = message;
+            console.error(message);
+        }
+
+        // Запуск камеры
         navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
             .then(stream => {
                 video.srcObject = stream;
-                video.play();
-                scanQRCode();
+                video.onloadedmetadata = () => {
+                    video.play();
+                    resultDiv.innerText = 'Камера работает, сканую...';
+                    scanQRCode();
+                };
             })
             .catch(err => {
-                resultDiv.innerText = 'Ошибка доступа к камере: ' + err.message;
+                showError('Ошибка камеры: ' + err.message);
             });
 
+        // Сканирование QR-кода
         function scanQRCode() {
             if (video.readyState === video.HAVE_ENOUGH_DATA) {
                 canvas.width = video.videoWidth;
@@ -63,18 +76,18 @@
                 const code = jsQR(imageData.data, imageData.width, imageData.height);
 
                 if (code) {
-                    // QR-код найден, отправляем результат в Telegram
                     resultDiv.innerText = 'Найден QR: ' + code.data;
                     window.Telegram.WebApp.sendData(code.data);
-                    // Останавливаем камеру
                     video.srcObject.getTracks().forEach(track => track.stop());
+                    return; // Прерываем сканирование
                 }
+            } else {
+                resultDiv.innerText = 'Камера ещё не готова...';
             }
-            // Продолжаем сканирование, если QR не найден
             requestAnimationFrame(scanQRCode);
         }
 
-        // Закрытие Mini App после отправки данных (опционально)
+        // Закрытие после отправки (опционально)
         window.Telegram.WebApp.onEvent('dataSent', () => {
             window.Telegram.WebApp.close();
         });
