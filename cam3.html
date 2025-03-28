@@ -7,6 +7,7 @@ async function startCamera() {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
                 const video = document.getElementById("video");
                 video.srcObject = stream;
+        
                 // video.style.display = "block";
             } catch (error) {
                 document.getElementById("status").innerText = "❌ Ошибка доступа: " + error.message;
