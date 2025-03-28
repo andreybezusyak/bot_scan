@@ -1,0 +1,22 @@
+<html>
+<body>
+    <button id="startButton">📸 Включить камеру</button>
+    <video id="video" autoplay playsinline style="width: 100%; max-width: 600px; display: none;"></video>
+
+    <script>
+        document.getElementById("startButton").addEventListener("click", async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+                const video = document.getElementById("video");
+                video.srcObject = stream;
+                video.style.display = "block";
+                document.getElementById("status").innerText = "✅ Камера работает!";
+            } catch (error) {
+                document.getElementById("status").innerText = "❌ Ошибка доступа: " + error.message;
+                console.error("Ошибка доступа к камере:", error);
+                alert("Разрешите доступ к камере в настройках устройства!");
+            }
+        });
+    </script>
+</body>
+</html>
