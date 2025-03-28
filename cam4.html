@@ -1,8 +1,17 @@
 <html>
 <body>
+    <button id="startButton">📸 Включить камеру !</button>
     <video id="video" autoplay playsinline style="width: 100%; max-width: 600px; display: none;" allow="camera;microphone"></video>
 <script>
     const video = document.getElementById('video');
+
+    document.getElementById("startButton").addEventListener("click", async () => {
+            startCamera();
+        });
+
+
+
+
         async function startCamera() {
             try {
                         const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
@@ -20,7 +29,6 @@
     // Проверка поддержки камеры
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             startCamera();
-            location.reload();
         } else {
             resultDiv.innerText = "❌ Ваш браузер не поддерживает камеру!";
         }
