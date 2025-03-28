@@ -427,6 +427,10 @@
       
       let isVideoActive = false;
       let selectedFiles = [];
+
+      if (window.Telegram && Telegram.WebApp) {
+        Telegram.WebApp.expand(); // Разворачивает на весь экран
+        }
       
       // Function to start camera
       const startCamera = async () => {
