@@ -4,10 +4,10 @@
 <script>
         async function startCamera() {
             try {
-                        // const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-                        // const video = document.getElementById("video");
-                        document.getElementById("video").srcObject = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-                        // video.style.display = "block";
+                        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+                        const video = document.getElementById("video");
+                        // document.getElementById("video").srcObject = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+                        video.style.display = "block";
                     } catch (error) {
                         document.getElementById("status").innerText = "❌ Ошибка доступа: " + error.message;
                         console.error("Ошибка доступа к камере:", error);
