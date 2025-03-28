@@ -20,7 +20,7 @@
     // Проверка поддержки камеры
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
             startCamera();
-        startCamera();
+            location.reload();
         } else {
             resultDiv.innerText = "❌ Ваш браузер не поддерживает камеру!";
         }
