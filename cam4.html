@@ -1,6 +1,6 @@
 <html>
 <body>
-    <button id="startButton" onclick="startCamera();">📸 Включить камеру cccc</button>
+    <button id="startButton" onclick="startCamera();">📸 Включить камеру</button>
     <video id="video" autoplay playsinline style="width: 100%; max-width: 600px; display: none;" allow="camera;microphone"></video>
 <script>
     const video = document.getElementById('video');
@@ -12,9 +12,9 @@
 
 
 
-        function startCamera() {
+        async function startCamera() {
             try {
-                        const stream = navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+                        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
                         video.srcObject = stream;
                         video.onloadedmetadata = () => {
                             video.play();
