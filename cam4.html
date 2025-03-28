@@ -1,6 +1,6 @@
 <html>
 <body>
-    <button id="startButton">📸 Включить камеру 999</button>
+    <button id="startButton">📸 Включить камеру 000</button>
     <video id="video" autoplay playsinline style="width: 100%; max-width: 600px; display: none;"></video>
 
     <script>
@@ -28,12 +28,13 @@
             return /Android/i.test(navigator.userAgent);
         }        
         
-        document.addEventListener('DOMContentLoaded', async () => {
-            if (isAndroid()) {
-                document.getElementById("startButton").click();
-            }
-            // StartCam();
-        });
+document.addEventListener('DOMContentLoaded', () => {
+    if (isAndroid()) {
+        setTimeout(() => {
+            document.getElementById("startButton").dispatchEvent(new Event("click", { bubbles: true }));
+        }, 500); // Небольшая задержка для корректной инициализации
+    }
+});
     </script>
 </body>
 </html>
