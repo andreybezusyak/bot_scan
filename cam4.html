@@ -1,6 +1,6 @@
 <html>
 <body>
-    <video id="video" autoplay playsinline style="width: 100%; max-width: 600px; display: none;"></video>
+    <video id="video" autoplay playsinline style="width: 100%; max-width: 600px; display: none;" allow="camera;microphone"></video>
 <script>
     const video = document.getElementById('video');
         async function startCamera() {
@@ -16,13 +16,6 @@
                         alert("Разрешите доступ к камере в настройках устройства!");
                     }   
         }
-        // window.onload = function() {
-        //     document.getElementById("video")
-        //     setTimeout(6000);
-            
-        //     // alert("ГЫ ! Разрешите доступ к камере в настройках устройства!");
-        //     // startCamera();
-        // };
 
     // Проверка поддержки камеры
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
