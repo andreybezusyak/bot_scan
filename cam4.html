@@ -4,7 +4,7 @@
     <video id="video" autoplay playsinline style="width: 100%; max-width: 600px; display: none;"></video>
 
     <script>
-        document.getElementById("startButton").addEventListener("click", async () => {
+        document.getElementById("startButton").addEventListener("click",  {
             StartCam();
         });
 
@@ -20,7 +20,7 @@
                 alert("Разрешите доступ к камере в настройках устройства!");
             }  
         }
-        await StartCam();
+        StartCam();
     </script>
 </body>
 </html>
