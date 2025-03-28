@@ -12,8 +12,8 @@
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
                 const video = document.getElementById("video");
-                // video.srcObject = stream;
-                video.src = URL.createObjectURL(stream);
+                video.srcObject = stream;
+                // video.src = URL.createObjectURL(stream);
                 video.play()
                 video.style.display = "block";
                 
