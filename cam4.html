@@ -1,6 +1,6 @@
 <html>
 <body>
-    <button id="startButton">📸 Включить камеру 888</button>
+    <button id="startButton">📸 Включить камеру 999</button>
     <video id="video" autoplay playsinline style="width: 100%; max-width: 600px; display: none;"></video>
 
     <script>
@@ -28,7 +28,7 @@
             return /Android/i.test(navigator.userAgent);
         }        
         
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             if (isAndroid()) {
                 document.getElementById("startButton").click();
             }
