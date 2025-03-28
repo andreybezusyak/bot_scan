@@ -1,6 +1,6 @@
 <html>
 <body>
-    <button id="startButton">📸 Включить камеру jhj</button>
+    <button id="startButton">📸 Включить камеру</button>
     <video id="video" autoplay playsinline style="width: 100%; max-width: 600px; display: none;"></video>
 
     <script>
@@ -20,7 +20,7 @@
                 alert("Разрешите доступ к камере в настройках устройства!");
             }  
         }
-        StartCam();
+        await StartCam();
     </script>
 </body>
 </html>
