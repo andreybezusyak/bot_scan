@@ -8,7 +8,8 @@
 
 async function startCamera() {
     try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+                //const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
                 const video = document.getElementById("video");
                 video.srcObject = stream;
                 video.style.display = "block";
