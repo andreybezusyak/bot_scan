@@ -1,24 +1,22 @@
 <html>
 <body>
-    <video id="video" autoplay playsinline style="width: 100%; max-width: 600px; display: none;"></video>
+    <video id="video" autoplay playsinline style="width: 100%; max-width: 300px; display: none;"></video>
 <script>
-async function startCamera() {
-    try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-                const video = document.getElementById("video");
-                video.srcObject = stream;
-        
-                // video.style.display = "block";
-            } catch (error) {
-                document.getElementById("status").innerText = "❌ Ошибка доступа: " + error.message;
-                console.error("Ошибка доступа к камере:", error);
-                alert("Разрешите доступ к камере в настройках устройства!");
-            }   
-}
+        async function startCamera() {
+            try {
+                        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+                        const video = document.getElementById("video");
+                        video.srcObject = stream;
+                        video.style.display = "block";
+                    } catch (error) {
+                        document.getElementById("status").innerText = "❌ Ошибка доступа: " + error.message;
+                        console.error("Ошибка доступа к камере:", error);
+                        alert("Разрешите доступ к камере в настройках устройства!");
+                    }   
+        }
         window.onload = function() {
-            // setTimeout(startCamera, 1000);
-           startCamera() 
+            startCamera();
         };
-    </script>
+</script>
 </body>
 </html>
