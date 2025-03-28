@@ -1,21 +1,20 @@
 <html>
 <body>
-    <button id="startButton">📸 Включить камеру ??</button>
+    <button id="startButton" onclick="startCamera();">📸 Включить камеру cccc</button>
     <video id="video" autoplay playsinline style="width: 100%; max-width: 600px; display: none;" allow="camera;microphone"></video>
 <script>
     const video = document.getElementById('video');
 
-    document.getElementById("startButton").addEventListener("click", async () => {
-            location.reload();
-            startCamera();
-        });
+    // document.getElementById("startButton").addEventListener("click"  {  //async () =>
+    //         startCamera();
+    //     });
 
 
 
 
-        async function startCamera() {
+        function startCamera() {
             try {
-                        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+                        const stream = navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
                         video.srcObject = stream;
                         video.onloadedmetadata = () => {
                             video.play();
@@ -27,12 +26,11 @@
                     }   
         }
 
-    // Проверка поддержки камеры
-    // if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    //         startCamera();
-    //     } else {
-    //         resultDiv.innerText = "❌ Ваш браузер не поддерживает камеру!";
-    //     }
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            startCamera();
+        } else {
+            resultDiv.innerText = "❌ Ваш браузер не поддерживает камеру!";
+        }
 </script>
 </body>
 </html>
