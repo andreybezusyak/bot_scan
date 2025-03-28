@@ -1,6 +1,6 @@
 <html>
 <body>
-    <button id="startButton">📸 Включить камеру 777</button>
+    <button id="startButton">📸 Включить камеру 888</button>
     <video id="video" autoplay playsinline style="width: 100%; max-width: 600px; display: none;"></video>
 
     <script>
@@ -24,11 +24,15 @@
             }  
         }
         // document.addEventListener('DOMContentLoaded', StartCam);
+        function isAndroid() {
+            return /Android/i.test(navigator.userAgent);
+        }        
+        
         document.addEventListener('DOMContentLoaded', () => {
-            // if (isAndroid()) {
-            //     document.getElementById("startButton").click();
-            // }
-            StartCam();
+            if (isAndroid()) {
+                document.getElementById("startButton").click();
+            }
+            // StartCam();
         });
     </script>
 </body>
