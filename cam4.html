@@ -30,9 +30,8 @@
         
 document.addEventListener('DOMContentLoaded', () => {
     if (isAndroid()) {
-        setTimeout(() => {
-            document.getElementById("startButton").dispatchEvent(new Event("click", { bubbles: true }));
-        }, 500); // Небольшая задержка для корректной инициализации
+        alert("Нажмите OK, чтобы включить камеру");
+        StartCam();
     }
 });
     </script>
