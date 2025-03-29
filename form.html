@@ -444,6 +444,7 @@
           });
           
           videoElement.srcObject = stream;
+          videoElement.play();
           videoContainer.style.display = 'block';
           cameraControls.classList.remove('hidden');
           isVideoActive = true;
