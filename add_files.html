@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Форма рекламації</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+    
+    body {
+      background: linear-gradient(to bottom right, #1a1f2c, #483285, #1a1f2c);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .container {
+      background: linear-gradient(to bottom, #1c1c2e, #292945);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 500px;
+      padding: 24px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    h2 {
+      font-size: 24px;
+      margin-bottom: 24px;
+      background: linear-gradient(to right, #b68eff, #fe85a4);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-weight: 600;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      margin-bottom: 8px;
+      color: #ccc;
+    }
+    
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      background-color: rgba(30, 30, 45, 0.6);
+      border: 1px solid rgba(80, 80, 100, 0.8);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+    
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #8b5cf6;
+    }
+    
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    
+    .input-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 16px;
+      background: linear-gradient(to right, #8b5cf6, #d946ef);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      gap: 8px;
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn:hover {
+      background: linear-gradient(to right, #7c4dff, #c837e0);
+      transform: translateY(-1px);
+    }
+    
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn-scan {
+      margin-bottom: 20px;
+    }
+    
+    .btn-submit {
+      margin-top: 10px;
+      height: 48px;
+      font-size: 16px;
+    }
+    
+    .video-container {
+      width: 100%;
+      margin-bottom: 20px;
+      background-color: #000;
+      border-radius: 8px;
+      overflow: hidden;
+      display: none;
+      position: relative;
+      aspect-ratio: 4/3;
+    }
+    
+    #camera-feed {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .barcode-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(0,0,0,0.2);
+      z-index: 2;
+    }
+    
+    .barcode-icon {
+      width: 120px;
+      height: 120px;
+      opacity: 0.7;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% {
+        opacity: 0.4;
+      }
+      50% {
+        opacity: 0.8;
+      }
+      100% {
+        opacity: 0.4;
+      }
+    }
+    
+    .button-container {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .image-preview-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+    
+    .image-preview {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid rgba(80, 80, 100, 0.8);
+    }
+    
+    .image-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .remove-image {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      background-color: rgba(220, 38, 38, 0.8);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    
+    .image-preview:hover .remove-image {
+      opacity: 1;
+    }
+    
+    .file-upload {
+      border: 2px dashed rgba(80, 80, 100, 0.8);
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      background-color: rgba(30, 30, 45, 0.3);
+      transition: background-color 0.2s;
+    }
+    
+    .file-upload:hover {
+      background-color: rgba(30, 30, 45, 0.6);
+    }
+    
+    .file-upload p {
+      margin: 10px 0 0;
+      font-size: 14px;
+      color: #ccc;
+    }
+    
+    .file-upload strong {
+      color: #ddd;
+    }
+    
+    .file-upload small {
+      display: block;
+      margin-top: 5px;
+      color: #999;
+      font-size: 12px;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    .icon {
+      width: 16px;
+      height: 16px;
+    }
+    
+    @media (max-width: 480px) {
+      .input-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .image-preview-container {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <form id="claim-form">
+      <!-- Barcode scanning button -->
+      <button type="button" class="btn btn-scan" id="scan-barcode">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 7V5a2 2 0 0 1 2-2h2" />
+          <path d="M17 3h2a2 2 0 0 1 2 2v2" />
+          <path d="M21 17v2a2 2 0 0 1-2 2h-2" />
+          <path d="M7 21H5a2 2 0 0 1-2-2v-2" />
+          <rect x="7" y="7" width="3" height="10" />
+          <rect x="14" y="7" width="3" height="10" />
+        </svg>
+        Сканувати ШК
+      </button>
+      
+      <!-- Video display area -->
+      <div class="video-container" id="video-container">
+        <video id="camera-feed" autoplay playsinline></video>
+        <div class="barcode-overlay" id="barcode-overlay">
+          <svg class="barcode-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1">
+            <rect width="20" height="15" x="2" y="4" rx="2" />
+            <path d="M4 9h2m-2 3h1m-1 3h2m2-9h1m0 9h1m0-9h4m0 9h4m-9-6h1m-1 3h1m11-6h-4m4 3h-4m4 3h-4m-2-6h-1m0 9h-1" />
+          </svg>
+        </div>
+      </div>
+      
+      <div class="button-container hidden" id="camera-controls">
+        <button type="button" class="btn" style="background: rgba(80, 80, 100, 0.8);" id="stop-camera">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+          Зупинити камеру
+        </button>
+        
+        <button type="button" class="btn" style="background: linear-gradient(to right, #f59e0b, #f97316);" id="simulate-scan">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect width="20" height="15" x="2" y="4" rx="2" />
+            <path d="M4 9h2m-2 3h1m-1 3h2m2-9h1m0 9h1m0-9h4m0 9h4m-9-6h1m-1 3h1m11-6h-4m4 3h-4m4 3h-4m-2-6h-1m0 9h-1" />
+          </svg>
+          Симуляція сканування
+        </button>
+      </div>
+      
+      <!-- Client information -->
+      <div class="form-group">
+        <label for="client">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          Клієнт
+        </label>
+        <input type="text" id="client" name="client" placeholder="Іванов Іван Іванович" required>
+      </div>
+      
+      <!-- Phone and Store ID -->
+      <div class="input-grid">
+        <div class="form-group">
+          <label for="phone">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+            </svg>
+            Телефон
+          </label>
+          <input type="tel" id="phone" name="phone" placeholder="+380 (123) 456-7890" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="storeId">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            ID магазину
+          </label>
+          <input type="text" id="storeId" name="storeId" placeholder="123456" required>
+        </div>
+      </div>
+      
+      <!-- Problem description -->
+      <div class="form-group">
+        <label for="description">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+          Опис проблеми
+        </label>
+        <textarea id="description" name="description" placeholder="Детально опишіть проблему, що виникла..." required></textarea>
+      </div>
+      
+      <!-- Barcode field -->
+      <div class="form-group">
+        <label for="barcode">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect width="20" height="15" x="2" y="4" rx="2" />
+            <path d="M4 9h2m-2 3h1m-1 3h2m2-9h1m0 9h1m0-9h4m0 9h4m-9-6h1m-1 3h1m11-6h-4m4 3h-4m4 3h-4m-2-6h-1m0 9h-1" />
+          </svg>
+          Штрих-код
+        </label>
+        <input type="text" id="barcode" name="barcode" placeholder="Введіть або відскануйте штрих-код">
+      </div>
+      
+      <!-- Photo upload -->
+      <div class="form-group">
+        <label>
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
+          Фото (одна або декілька)
+        </label>
+        
+        <label for="photo-upload" class="file-upload">
+          <svg class="icon" style="width: 32px; height: 32px; margin: 0 auto; display: block; color: #aaa;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
+          <p><strong>Клікніть для завантаження</strong> або перетягніть файли сюди</p>
+          <small>PNG, JPG або JPEG (макс. 5 МБ)</small>
+          <input type="file" id="photo-upload" class="hidden" multiple accept="image/*">
+        </label>
+        
+        <div class="image-preview-container" id="image-preview-container"></div>
+      </div>
+      
+      <!-- Submit button -->
+      <button type="submit" class="btn btn-submit" id="submit-btn">
+        Відправити рекламацію
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </button>
+    </form>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const scanBarcodeBtn = document.getElementById('scan-barcode');
+      const stopCameraBtn = document.getElementById('stop-camera');
+      const simulateScanBtn = document.getElementById('simulate-scan');
+      const videoContainer = document.getElementById('video-container');
+      const cameraControls = document.getElementById('camera-controls');
+      const videoElement = document.getElementById('camera-feed');
+      const barcodeInput = document.getElementById('barcode');
+      const photoUpload = document.getElementById('photo-upload');
+      const imagePreviewContainer = document.getElementById('image-preview-container');
+      const claimForm = document.getElementById('claim-form');
+      const submitBtn = document.getElementById('submit-btn');
+      
+      let isVideoActive = false;
+      let selectedFiles = [];
+
+      if (window.Telegram && Telegram.WebApp) {
+        Telegram.WebApp.expand(); // Разворачивает на весь экран
+        }
+      
+      // Function to start camera !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      const startCamera = async () => {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ 
+            video: { 
+              facingMode: 'environment',
+              width: { ideal: 1280 },
+              height: { ideal: 720 } 
+            } 
+          });
+          
+          videoElement.srcObject = stream;
+          videoContainer.style.display = 'block';
+          cameraControls.classList.remove('hidden');
+          isVideoActive = true;
+        } catch (error) {
+          alert('Не вдалося отримати доступ до камери: ' + error.message);
+          console.error('Error accessing camera:', error);
+        }
+      };
+      
+      // Function to stop camera
+      const stopCamera = () => {
+        if (videoElement.srcObject) {
+          const stream = videoElement.srcObject;
+          const tracks = stream.getTracks();
+          
+          tracks.forEach(track => track.stop());
+          videoElement.srcObject = null;
+          videoContainer.style.display = 'none';
+          cameraControls.classList.add('hidden');
+          isVideoActive = false;
+        }
+      };
+      
+      // Scan barcode button event listener
+      scanBarcodeBtn.addEventListener('click', () => {
+        if (!isVideoActive) {
+          startCamera();
+        }
+      });
+      
+      // Stop camera button event listener
+      stopCameraBtn.addEventListener('click', stopCamera);
+      
+      // Simulate barcode scanning
+      simulateScanBtn.addEventListener('click', () => {
+        const randomBarcode = Math.floor(Math.random() * 10000000000000).toString();
+        barcodeInput.value = randomBarcode;
+        
+        // Show success message
+        const toast = document.createElement('div');
+        toast.style.position = 'fixed';
+        toast.style.bottom = '20px';
+        toast.style.left = '50%';
+        toast.style.transform = 'translateX(-50%)';
+        toast.style.padding = '12px 20px';
+        toast.style.background = 'rgba(34, 197, 94, 0.9)';
+        toast.style.color = 'white';
+        toast.style.borderRadius = '8px';
+        toast.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.2)';
+        toast.style.zIndex = '1000';
+        toast.style.display = 'flex';
+        toast.style.alignItems = 'center';
+        toast.style.gap = '8px';
+        toast.style.fontSize = '14px';
+        
+        toast.innerHTML = `
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          Штрихкод знайдено: ${randomBarcode}
+        `;
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+          toast.style.opacity = '0';
+          toast.style.transition = 'opacity 0.5s';
+          setTimeout(() => {
+            document.body.removeChild(toast);
+          }, 500);
+        }, 3000);
+        
+        stopCamera();
+      });
+      
+      // Handle file selection
+      photoUpload.addEventListener('change', event => {
+        if (event.target.files) {
+          const newFiles = Array.from(event.target.files);
+          selectedFiles = [...selectedFiles, ...newFiles];
+          
+          updateImagePreviews();
+        }
+      });
+      
+      // Update image previews
+      function updateImagePreviews() {
+        imagePreviewContainer.innerHTML = '';
+        
+        selectedFiles.forEach((file, index) => {
+          const previewDiv = document.createElement('div');
+          previewDiv.className = 'image-preview';
+          
+          const img = document.createElement('img');
+          img.src = URL.createObjectURL(file);
+          previewDiv.appendChild(img);
+          
+          const removeBtn = document.createElement('button');
+          removeBtn.className = 'remove-image';
+          removeBtn.innerHTML = '×';
+          removeBtn.addEventListener('click', () => {
+            selectedFiles = selectedFiles.filter((_, i) => i !== index);
+            updateImagePreviews();
+          });
+          
+          previewDiv.appendChild(removeBtn);
+          imagePreviewContainer.appendChild(previewDiv);
+        });
+      }
+      
+      // Form submission
+      claimForm.addEventListener('submit', event => {
+        event.preventDefault();
+        
+        // Change button state to loading
+        const originalBtnText = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;">
+            <circle cx="12" cy="12" r="10" stroke-opacity="0.25" stroke-width="4"></circle>
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10" stroke-opacity="0.75" stroke-width="4"></path>
+          </svg>
+          Відправка...
+        `;
+        
+        // Add keyframes for loading animation
+        if (!document.getElementById('spin-keyframes')) {
+          const style = document.createElement('style');
+          style.id = 'spin-keyframes';
+          style.textContent = `
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          `;
+          document.head.appendChild(style);
+        }
+        
+        // Simulate form submission with a delay
+        setTimeout(() => {
+          // Create form data
+          const formData = new FormData(claimForm);
+          
+          // Add files to form data
+          selectedFiles.forEach((file, index) => {
+            formData.append(`image-${index}`, file);
+          });
+          
+          // Log form data (in a real app, you would send this to a server)
+          console.log('Form data collected:');
+          for (const [key, value] of formData.entries()) {
+            console.log(`${key}: ${value instanceof File ? value.name : value}`);
+          }
+          
+          // Show success message
+          const toast = document.createElement('div');
+          toast.style.position = 'fixed';
+          toast.style.bottom = '20px';
+          toast.style.left = '50%';
+          toast.style.transform = 'translateX(-50%)';
+          toast.style.padding = '12px 20px';
+          toast.style.background = 'rgba(79, 70, 229, 0.9)';
+          toast.style.color = 'white';
+          toast.style.borderRadius = '8px';
+          toast.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.2)';
+          toast.style.zIndex = '1000';
+          toast.style.display = 'flex';
+          toast.style.alignItems = 'center';
+          toast.style.gap = '8px';
+          toast.style.fontSize = '14px';
+          
+          toast.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            Рекламацію відправлено успішно!
+          `;
+          
+          document.body.appendChild(toast);
+          
+          setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transition = 'opacity 0.5s';
+            setTimeout(() => {
+              document.body.removeChild(toast);
+            }, 500);
+          }, 3000);
+          
+          // Reset form and button
+          claimForm.reset();
+          selectedFiles = [];
+          updateImagePreviews();
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalBtnText;
+        }, 1500);
+      });
+    });
+  </script>
+</body>
+</html>
