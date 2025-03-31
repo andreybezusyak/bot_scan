@@ -286,10 +286,20 @@
         handleFiles(event.dataTransfer.files);
       });
 
+
       function handleFiles(files) {
-        const newFiles = Array.from(files);
-        selectedFiles = [...selectedFiles, ...newFiles];
-        updateImagePreviews();
+        const validFiles = Array.from(files).filter(file => file.type === 'image/jpeg' || file.type === 'image/png');
+        validFiles.forEach(file => {
+          if (file.size > 5 * 1024 * 1024) {
+            compressImage(file, compressedFile => {
+              selectedFiles.push(compressedFile);
+              updateImagePreviews();
+            });
+          } else {
+            selectedFiles.push(file);
+            updateImagePreviews();
+          }
+        });
       }
       
       // Update image previews
@@ -308,7 +318,6 @@
           removeBtn.className = 'remove-image';
           removeBtn.innerHTML = '×';
           removeBtn.addEventListener('click', () => {
-            // selectedFiles = selectedFiles.filter((_, i) => i !== index);
             selectedFiles.splice(index, 1);
             updateImagePreviews();
           });
@@ -317,7 +326,23 @@
           imagePreviewContainer.appendChild(previewDiv);
         });
       }
-   
+      function compressImage(file, callback) {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function(event) {
+          const img = new Image();
+          img.src = event.target.result;
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const scale = Math.min(800 / img.width, 800 / img.height);
+            canvas.width = img.width * scale;
+            canvas.height = img.height * scale;
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            canvas.toBlob(blob => callback(new File([blob], file.name, { type: 'image/jpeg' })), 'image/jpeg', 0.8);
+          };
+        };
+      }
     });
   </script>
 </body>
