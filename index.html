@@ -326,15 +326,27 @@
           Зупинити камеру
         </button>
         
-        <button type="button" class="btn" style="background: linear-gradient(to right, #f59e0b, #f97316);" id="simulate-scan">
+        <!-- <button type="button" class="btn" style="background: linear-gradient(to right, #f59e0b, #f97316);" id="simulate-scan">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect width="20" height="15" x="2" y="4" rx="2" />
             <path d="M4 9h2m-2 3h1m-1 3h2m2-9h1m0 9h1m0-9h4m0 9h4m-9-6h1m-1 3h1m11-6h-4m4 3h-4m4 3h-4m-2-6h-1m0 9h-1" />
           </svg>
           Симуляція сканування
-        </button>
+        </button> -->
       </div>
       
+      <!-- Barcode field -->
+      <div class="form-group">
+        <label for="barcode">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect width="20" height="15" x="2" y="4" rx="2" />
+            <path d="M4 9h2m-2 3h1m-1 3h2m2-9h1m0 9h1m0-9h4m0 9h4m-9-6h1m-1 3h1m11-6h-4m4 3h-4m4 3h-4m-2-6h-1m0 9h-1" />
+          </svg>
+          Штрих-код
+        </label>
+        <input type="text" id="barcode" name="barcode" placeholder="Введіть або відскануйте штрих-код">
+      </div>
+
       <!-- Client information -->
       <div class="form-group">
         <label for="client">
@@ -382,17 +394,7 @@
         <textarea id="description" name="description" placeholder="Детально опишіть проблему, що виникла..." required></textarea>
       </div>
       
-      <!-- Barcode field -->
-      <div class="form-group">
-        <label for="barcode">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect width="20" height="15" x="2" y="4" rx="2" />
-            <path d="M4 9h2m-2 3h1m-1 3h2m2-9h1m0 9h1m0-9h4m0 9h4m-9-6h1m-1 3h1m11-6h-4m4 3h-4m4 3h-4m-2-6h-1m0 9h-1" />
-          </svg>
-          Штрих-код
-        </label>
-        <input type="text" id="barcode" name="barcode" placeholder="Введіть або відскануйте штрих-код">
-      </div>
+
       
       <!-- Photo upload -->
       <div class="form-group">
@@ -402,7 +404,7 @@
             <circle cx="8.5" cy="8.5" r="1.5"></circle>
             <polyline points="21 15 16 10 5 21"></polyline>
           </svg>
-          Фото (одна або декілька)
+          Фото пошкодження (одна або декілька)
         </label>
         
         <label for="photo-upload" class="file-upload" id="drop-area">
@@ -413,7 +415,7 @@
           </svg>
           <p><strong>Клікніть для завантаження</strong> або перетягніть файли сюди</p>
           <small>PNG, JPG або JPEG (макс. 5 МБ)</small>
-          <input type="file" id="photo-upload" class="hidden" multiple accept="image/*">
+          <input type="file" id="photo-upload" multiple accept="image/*" style="display: none;">
         </label>
         
         <div class="image-preview-container" id="image-preview-container"></div>
@@ -434,7 +436,7 @@
     document.addEventListener('DOMContentLoaded', function() {
       const scanBarcodeBtn = document.getElementById('scan-barcode');
       const stopCameraBtn = document.getElementById('stop-camera');
-      const simulateScanBtn = document.getElementById('simulate-scan');
+      // const simulateScanBtn = document.getElementById('simulate-scan');
       const videoContainer = document.getElementById('video-container');
       const cameraControls = document.getElementById('camera-controls');
       const barcodeInput = document.getElementById('barcode');
@@ -518,14 +520,12 @@
         });
       }
       
-      // Function to start barcode scanning
+      // Function to start/stop barcode scanning
       const startScanning = () => {
         if (!isVideoActive) {
           initQuagga();
         }
       };
-      
-      // Function to stop barcode scanning
       const stopScanning = () => {
         if (isQuaggaInitialized) {
           Quagga.stop();
@@ -601,46 +601,21 @@
       // Stop camera button event listener
       stopCameraBtn.addEventListener('click', stopScanning);
       
-      // Simulate barcode scanning
-      simulateScanBtn.addEventListener('click', () => {
-        const randomBarcode = Math.floor(Math.random() * 10000000000000).toString();
-        barcodeInput.value = randomBarcode;
         
-        // Show success message
-        showToast(`Штрихкод знайдено: ${randomBarcode}`, 'success');
-        
-        stopScanning();
-      });
-      
-      // Handle file selection
-      photoUpload.addEventListener('change', event => {
-        if (event.target.files) {
-          const newFiles = Array.from(event.target.files);
-          selectedFiles = [...selectedFiles, ...newFiles];
-          
-          updateImagePreviews();
-        }
-      });
-      
       // PHOTO UPLOAD DRAG AND DROP !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       photoUpload.addEventListener('change', event => handleFiles(event.target.files));
-
       dropArea.addEventListener('dragover', event => {
         event.preventDefault();
         dropArea.style.backgroundColor = '#888';
       });
-
       dropArea.addEventListener('dragleave', () => {
         dropArea.style.backgroundColor = '';
       });
-
       dropArea.addEventListener('drop', event => {
         event.preventDefault();
         dropArea.style.backgroundColor = '';
         handleFiles(event.dataTransfer.files);
       });
-
-
       function handleFiles(files) {
         const validFiles = Array.from(files).filter(file => file.type === 'image/jpeg' || file.type === 'image/png');
         validFiles.forEach(file => {
@@ -655,7 +630,6 @@
           }
         });
       }
-      
       function updateImagePreviews() {
         imagePreviewContainer.innerHTML = '';
         
@@ -696,7 +670,6 @@
           };
         };
       }
-    
     
       
       
