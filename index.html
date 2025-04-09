@@ -694,24 +694,7 @@
           document.head.appendChild(style);
         }
         
-        const dataToSend = {
-          barcode: formData.get('barcode'),
-          client: formData.get('client'),
-          phone: formData.get('phone'),
-          storeId: formData.get('storeId'),
-          description: formData.get('description'),
-          images: []
-        };
-
-        if (window.Telegram && Telegram.WebApp) {
-          Telegram.WebApp.sendData(JSON.stringify(dataToSend));
-        } else {
-          showToast('Помилка: Telegram WebApp недоступний', 'error');
-        } 
-
-
-
-        // Simulate form submission with a delay
+        // // Simulate form submission with a delay
         // setTimeout(() => {
         //   // Create form data
         //   const formData = new FormData(claimForm);
@@ -737,6 +720,53 @@
         //   submitBtn.disabled = false;
         //   submitBtn.innerHTML = originalBtnText;
         // }, 1500);
+
+        // Сбор данных формы и отправка в Telegram
+      const dataToSend = {
+        barcode: formData.get('barcode'),
+        client: formData.get('client'),
+        phone: formData.get('phone'),
+        storeId: formData.get('storeId'),
+        description: formData.get('description'),
+        images: []
+      };
+
+      // Преобразование изображений в base64
+      const fileReadPromises = selectedFiles.map(file => {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      });
+
+      Promise.all(fileReadPromises).then(base64Images => {
+        dataToSend.images = base64Images;
+
+        if (window.Telegram && Telegram.WebApp) {
+          Telegram.WebApp.sendData(JSON.stringify(dataToSend));
+        } else {
+          showToast('Помилка: Telegram WebApp недоступний', 'error');
+        }
+
+        // сброс формы
+        claimForm.reset();
+        selectedFiles = [];
+        updateImagePreviews();
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnText;
+
+        showToast('Дані надіслано у бот!', 'success');
+      }).catch(error => {
+        console.error('Помилка читання зображень:', error);
+        showToast('Помилка при обробці зображень', 'error');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalBtnText;
+      });
+
+
+
       });
     });
 
