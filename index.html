@@ -326,13 +326,6 @@
           Зупинити камеру
         </button>
         
-        <!-- <button type="button" class="btn" style="background: linear-gradient(to right, #f59e0b, #f97316);" id="simulate-scan">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect width="20" height="15" x="2" y="4" rx="2" />
-            <path d="M4 9h2m-2 3h1m-1 3h2m2-9h1m0 9h1m0-9h4m0 9h4m-9-6h1m-1 3h1m11-6h-4m4 3h-4m4 3h-4m-2-6h-1m0 9h-1" />
-          </svg>
-          Симуляція сканування
-        </button> -->
       </div>
       
       <!-- Barcode field -->
@@ -701,32 +694,49 @@
           document.head.appendChild(style);
         }
         
+        const dataToSend = {
+          barcode: formData.get('barcode'),
+          client: formData.get('client'),
+          phone: formData.get('phone'),
+          storeId: formData.get('storeId'),
+          description: formData.get('description'),
+          images: []
+        };
+
+        if (window.Telegram && Telegram.WebApp) {
+          Telegram.WebApp.sendData(JSON.stringify(dataToSend));
+        } else {
+          showToast('Помилка: Telegram WebApp недоступний', 'error');
+        } 
+
+
+
         // Simulate form submission with a delay
-        setTimeout(() => {
-          // Create form data
-          const formData = new FormData(claimForm);
+        // setTimeout(() => {
+        //   // Create form data
+        //   const formData = new FormData(claimForm);
           
-          // Add files to form data
-          selectedFiles.forEach((file, index) => {
-            formData.append(`image-${index}`, file);
-          });
+        //   // Add files to form data
+        //   selectedFiles.forEach((file, index) => {
+        //     formData.append(`image-${index}`, file);
+        //   });
           
-          // Log form data (in a real app, you would send this to a server)
-          console.log('Form data collected:');
-          for (const [key, value] of formData.entries()) {
-            console.log(`${key}: ${value instanceof File ? value.name : value}`);
-          }
+        //   // Log form data (in a real app, you would send this to a server)
+        //   console.log('Form data collected:');
+        //   for (const [key, value] of formData.entries()) {
+        //     console.log(`${key}: ${value instanceof File ? value.name : value}`);
+        //   }
           
-          // Show success message
-          showToast('Рекламацію відправлено успішно!', 'success');
+        //   // Show success message
+        //   showToast('Рекламацію відправлено успішно!', 'success');
           
-          // Reset form and button
-          claimForm.reset();
-          selectedFiles = [];
-          updateImagePreviews();
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = originalBtnText;
-        }, 1500);
+        //   // Reset form and button
+        //   claimForm.reset();
+        //   selectedFiles = [];
+        //   updateImagePreviews();
+        //   submitBtn.disabled = false;
+        //   submitBtn.innerHTML = originalBtnText;
+        // }, 1500);
       });
     });
 
