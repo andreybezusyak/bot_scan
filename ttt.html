@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тестовая форма</title>
+    <style>
+        .spinner {
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        .btn:disabled .spinner {
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <form id="claim-form">
+        <button type="submit" class="btn btn-submit" id="submit-btn">
+            Завантажити фото
+            <svg class="spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 12a9 9 0 11-6.22-8.66"/>
+            </svg>
+        </button>
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Получаем форму по ID
+            const claimForm = document.getElementById('claim-form');
+
+            // Проверяем, что форма найдена
+            if (!claimForm) {
+                console.error('Форма с ID "claim-form" не найдена');
+                return;
+            }
+
+            // Добавляем обработчик события submit
+            claimForm.addEventListener('submit', async function(event) {
+                event.preventDefault(); // Предотвращаем стандартную отправку формы
+
+                const formFields = {
+                    barcode: '1234567890123',
+                };
+
+                try {
+                    // Проверяем наличие Telegram WebApp
+                    if (window.Telegram && window.Telegram.WebApp) {
+                        // Отправляем данные в Telegram-бот
+                        window.Telegram.WebApp.sendData(JSON.stringify(formFields));
+                        alert('Дані успішно надіслано!');
+                    } else {
+                        console.error('Telegram WebApp API недоступен');
+                        alert('Помилка: Ця сторінка повинна відкриватися через Telegram Web App');
+                    }
+                } catch (error) {
+                    console.error('Ошибка при отправке данных:', error);
+                    alert('Помилка при відправці даних: ' + error.message);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
