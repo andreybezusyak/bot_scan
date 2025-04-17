@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Тестовая форма</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         .spinner {
             width: 16px;
@@ -51,20 +52,20 @@
                     barcode: '1234567890123'
                 };
 
-                try {
-                    // Проверяем наличие Telegram WebApp
-                    if (window.Telegram && window.Telegram.WebApp) {
-                        // Отправляем данные в Telegram-бот
-                        window.Telegram.WebApp.sendData(JSON.stringify(formFields));
-                        alert('Дані успішно надіслано!');
-                    } else {
-                        console.error('Telegram WebApp API недоступен');
-                        alert('Помилка: Ця сторінка повинна відкриватися через Telegram Web App');
-                    }
-                } catch (error) {
-                    console.error('Ошибка при отправке данных:', error);
-                    alert('Помилка при відправці даних: ' + error.message);
-                }
+                Telegram.WebApp.sendData(JSON.stringify(formFields));
+
+                // try {
+                //     // Проверяем наличие Telegram WebApp
+                //     if (window.Telegram && window.Telegram.WebApp) {
+                //         // Отправляем данные в Telegram-бот
+                //         window.Telegram.WebApp.sendData(JSON.stringify(formFields));
+                //         alert('Дані успішно надіслано!');
+                //     } else {
+                //         alert('Помилка: Ця сторінка повинна відкриватися через Telegram Web App');
+                //     }
+                // } catch (error) {
+                //     alert('Помилка при відправці даних: ' + error.message);
+                // }
             });
         });
     </script>
