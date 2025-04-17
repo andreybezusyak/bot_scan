@@ -52,20 +52,20 @@
                     barcode: '1234567890123'
                 };
 
-                Telegram.WebApp.sendData(JSON.stringify(formFields));
+                // Telegram.WebApp.sendData(JSON.stringify(formFields));
 
-                // try {
-                //     // Проверяем наличие Telegram WebApp
-                //     if (window.Telegram && window.Telegram.WebApp) {
-                //         // Отправляем данные в Telegram-бот
-                //         window.Telegram.WebApp.sendData(JSON.stringify(formFields));
-                //         alert('Дані успішно надіслано!');
-                //     } else {
-                //         alert('Помилка: Ця сторінка повинна відкриватися через Telegram Web App');
-                //     }
-                // } catch (error) {
-                //     alert('Помилка при відправці даних: ' + error.message);
-                // }
+                try {
+                    // Проверяем наличие Telegram WebApp
+                    if (Telegram && Telegram.WebApp) {
+                        // Отправляем данные в Telegram-бот
+                        Telegram.WebApp.sendData(JSON.stringify(formFields));
+                        alert('Дані успішно надіслано!');
+                    } else {
+                        alert('Помилка: Ця сторінка повинна відкриватися через Telegram Web App');
+                    }
+                } catch (error) {
+                    alert('Помилка при відправці даних: ' + error.message);
+                }
             });
         });
     </script>
