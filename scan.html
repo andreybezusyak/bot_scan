@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Add Quagga.js for barcode scanning -->
+  <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+    
+    body {
+      background: linear-gradient(to bottom right, #1a1f2c, #483285, #1a1f2c);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .container {
+      background: linear-gradient(to bottom, #1c1c2e, #292945);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 500px;
+      padding: 24px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    h2 {
+      font-size: 24px;
+      margin-bottom: 24px;
+      background: linear-gradient(to right, #b68eff, #fe85a4);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-weight: 600;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      margin-bottom: 8px;
+      color: #ccc;
+    }
+    
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      background-color: rgba(30, 30, 45, 0.6);
+      border: 1px solid rgba(80, 80, 100, 0.8);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+    
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #8b5cf6;
+    }
+    
+    textarea {
+      min-height: 20px;
+      resize: vertical;
+    }
+    
+    .input-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 16px;
+      background: linear-gradient(to right, #8b5cf6, #d946ef);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      gap: 8px;
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn:hover {
+      background: linear-gradient(to right, #7c4dff, #c837e0);
+      transform: translateY(-1px);
+    }
+    
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn-scan {
+      margin-bottom: 20px;
+    }
+    
+    .btn-submit {
+      margin-top: 10px;
+      height: 48px;
+      font-size: 16px;
+    }
+    
+    .video-container {
+      width: 100%;
+      height: 400px;
+      margin-bottom: 20px;
+      background-color: #000;
+      border-radius: 8px;
+      overflow: hidden;
+      display: none;
+      position: relative;
+      aspect-ratio: 4/3;
+    }
+    
+    #camera-feed {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .barcode-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(0,0,0,0.2);
+      z-index: 2;
+    }
+    
+    .barcode-icon {
+      width: 120px;
+      height: 120px;
+      opacity: 0.7;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% {
+        opacity: 0.4;
+      }
+      50% {
+        opacity: 0.8;
+      }
+      100% {
+        opacity: 0.4;
+      }
+    }
+    
+    .button-container {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    
+    .image-preview-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+    
+    .image-preview {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid rgba(80, 80, 100, 0.8);
+    }
+    
+    .image-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .remove-image {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      background-color: rgba(220, 38, 38, 0.8);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    
+    .image-preview:hover .remove-image {
+      opacity: 1;
+    }
+    
+    .file-upload {
+      border: 2px dashed rgba(80, 80, 100, 0.8);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      background-color: rgba(30, 30, 45, 0.3);
+      transition: background-color 0.2s;
+    }
+    
+    .file-upload:hover {
+      background-color: rgba(30, 30, 45, 0.6);
+    }
+    
+    .file-upload p {
+      margin: 5px 0 0;
+      font-size: 14px;
+      color: #ccc;
+    }
+    
+    .file-upload strong {
+      color: #ddd;
+    }
+    
+    .file-upload small {
+      display: block;
+      margin-top: 5px;
+      color: #999;
+      font-size: 12px;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    .icon {
+      width: 16px;
+      height: 16px;
+    }
+    
+    @media (max-width: 480px) {
+      .input-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .image-preview-container {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    /* Additional styles for barcode scanner */
+    #interactive.viewport {
+      position: relative;
+    }
+    
+    #interactive.viewport > canvas, #interactive.viewport > video {
+      max-width: 100%;
+      width: 100%;
+    }
+    
+    .drawingBuffer {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+    }
+
+    /* Spinner styles */
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      animation: spin 1s linear infinite;
+      display: none;
+    }
+
+    .btn:disabled .spinner {
+      display: inline-block;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <form id="claim-form">
+      <!-- Barcode scanning button -->
+      <button type="button" class="btn btn-scan" id="scan-barcode">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 7V5a2 2 0 0 1 2-2h2" />
+          <path d="M17 3h2a2 2 0 0 1 2 2v2" />
+          <path d="M21 17v2a2 2 0 0 1-2 2h-2" />
+          <path d="M7 21H5a2 2 0 0 1-2-2v-2" />
+          <rect x="7" y="7" width="3" height="10" />
+          <rect x="14" y="7" width="3" height="10" />
+        </svg>
+        Сканувати ШК
+      </button>
+      
+      <!-- Video display area -->
+      <div class="video-container" id="video-container">
+        <div id="interactive" class="viewport"></div>
+        <div class="barcode-overlay" id="barcode-overlay">
+          <svg class="barcode-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1">
+            <rect width="20" height="15" x="2" y="4" rx="2" />
+            <path d="M4 9h2m-2 3h1m-1 3h2m2-9h1m0 9h1m0-9h4m0 9h4m-9-6h1m-1 3h1m11-6h-4m4 3h-4m4 3h-4m-2-6h-1m0 9h-1" />
+          </svg>
+        </div>
+      </div>
+      
+      <!-- Camera controls -->
+      <div class="button-container hidden" id="camera-controls">
+        <button type="button" class="btn" id="zoom-in">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            Збільшити зум
+        </button>
+          
+        <button type="button" class="btn" id="zoom-out">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            Зменшити зум
+        </button>
+
+        <button type="button" class="btn" style="background: rgba(80, 80, 100, 0.8);" id="stop-camera">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+          Зупинити камеру
+        </button>
+        
+
+      </div>
+      
+      <!-- Barcode field -->
+      <div class="form-group">
+        <label for="barcode">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect width="20" height="15" x="2" y="4" rx="2" />
+            <path d="M4 9h2m-2 3h1m-1 3h2m2-9h1m0 9h1m0-9h4m0 9h4m-9-6h1m-1 3h1m11-6h-4m4 3h-4m4 3h-4m-2-6h-1m0 9h-1" />
+          </svg>
+          Штрих-код
+        </label>
+        <input type="text" id="barcode" name="barcode" placeholder="Введіть або відскануйте штрих-код">
+      </div>
+
+
+      </div>
+      
+
+    </form>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const scanBarcodeBtn = document.getElementById('scan-barcode');
+      const stopCameraBtn = document.getElementById('stop-camera');
+      const videoContainer = document.getElementById('video-container');
+      const cameraControls = document.getElementById('camera-controls');
+      const barcodeInput = document.getElementById('barcode');
+      const claimForm = document.getElementById('claim-form');
+
+      
+      let isVideoActive = false;
+      let isQuaggaInitialized = false;
+                  
+      
+      // Function to initialize Quagga
+      function initQuagga() {
+        if (isQuaggaInitialized) {
+          return;
+        }
+        
+        Quagga.init({
+          inputStream: {
+            name: "Live",
+            type: "LiveStream",
+            target: document.querySelector("#interactive"),
+            constraints: {
+              facingMode: "environment",
+              width: { min: 640 },
+              height: { min: 480 },
+              aspectRatio: { min: 1, max: 2 },
+              advanced: [{ zoom: 2.0 }] // увеличиваем зум
+            },
+          },
+          locator: {
+            patchSize: "large",
+            halfSample: true
+          },
+          numOfWorkers: navigator.hardwareConcurrency || 4,
+          decoder: {
+            readers: [
+              "code_128_reader", 
+              "ean_reader", 
+              "ean_8_reader", 
+              "code_39_reader", 
+              "code_39_vin_reader", 
+              "upc_reader", 
+              "upc_e_reader"
+            ]
+          },
+          locate: true
+        }, function(err) {
+          if (err) {
+            console.error("Error initializing Quagga:", err);
+            alert("Не вдалося ініціалізувати сканер: " + err);
+            return;
+          }
+          
+          isQuaggaInitialized = true;
+          console.log("Quagga initialized successfully");
+          
+          Quagga.start();
+          isVideoActive = true;
+          videoContainer.style.display = 'block';
+          cameraControls.classList.remove('hidden');
+
+
+
+
+
+          
+          // Process barcode detection results
+          Quagga.onDetected(function(result) {
+            if (result && result.codeResult) {
+              const code = result.codeResult.code;
+              console.log("Barcode detected:", result.codeResult);
+              
+              // Set barcode value
+              barcodeInput.value = code;
+              
+              // Show success message
+              showToast(`Штрихкод знайдено: ${code}`, 'success');
+              
+              // Stop scanning
+              stopScanning();
+            }
+          });
+        });
+      }
+      
+
+        // === НОВЫЙ КОД ДЛЯ ЗУМА ===
+        let currentZoom = 2.0;
+        const zoomStep = 0.5;
+        const minZoom = 1.0;
+        const maxZoom = 5.0;
+
+        function applyZoom(track, zoomLevel) {
+            if (track && typeof track.applyConstraints === 'function') {
+            track.applyConstraints({
+                advanced: [{ zoom: zoomLevel }]
+            }).then(() => {
+                console.log(`Зум установлен на: ${zoomLevel}`);
+            }).catch(err => {
+                console.error('Ошибка при установке зума:', err);
+                showToast('Не вдалося змінити зум', 'error');
+            });
+            }
+        }
+
+        function getVideoTrack() {
+            const videoElement = document.querySelector('#interactive video');
+            if (videoElement && videoElement.srcObject) {
+            const stream = videoElement.srcObject;
+            return stream.getVideoTracks()[0];
+            }
+            return null;
+        }
+
+        document.getElementById('zoom-in').addEventListener('click', () => {
+            if (isVideoActive) {
+            currentZoom = Math.min(currentZoom + zoomStep, maxZoom);
+            const track = getVideoTrack();
+            applyZoom(track, currentZoom);
+            }
+        });
+
+        document.getElementById('zoom-out').addEventListener('click', () => {
+            if (isVideoActive) {
+            currentZoom = Math.max(currentZoom - zoomStep, minZoom);
+            const track = getVideoTrack();
+            applyZoom(track, currentZoom);
+            }
+        });
+        // === КОНЕЦ НОВОГО КОДА ===
+
+    //   });
+
+
+
+
+      // Function to start/stop barcode scanning
+      const startScanning = () => {
+        if (!isVideoActive) {
+          initQuagga();
+        }
+      };
+      const stopScanning = () => {
+        if (isQuaggaInitialized) {
+          Quagga.stop();
+          isQuaggaInitialized = false;
+        }
+        
+        isVideoActive = false;
+        videoContainer.style.display = 'none';
+        cameraControls.classList.add('hidden');
+      };
+      
+
+      // Scan barcode button event listener
+      scanBarcodeBtn.addEventListener('click', startScanning);
+      
+      // Stop camera button event listener
+      stopCameraBtn.addEventListener('click', stopScanning);
+
+    });
+
+  </script>
+</body>
+</html>
