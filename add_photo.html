@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Фото</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+    
+    body {
+      background: linear-gradient(to bottom right, #1a1f2c, #483285, #1a1f2c);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .container {
+      background: linear-gradient(to bottom, #1c1c2e, #292945);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 500px;
+      padding: 24px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    h2 {
+      font-size: 24px;
+      margin-bottom: 24px;
+      background: linear-gradient(to right, #b68eff, #fe85a4);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-weight: 600;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      margin-bottom: 8px;
+      color: #ccc;
+    }
+    
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      background-color: rgba(30, 30, 45, 0.6);
+      border: 1px solid rgba(80, 80, 100, 0.8);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+    
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #8b5cf6;
+    }
+    
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    
+    .input-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 16px;
+      background: linear-gradient(to right, #8b5cf6, #d946ef);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      gap: 8px;
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .btn:hover {
+      background: linear-gradient(to right, #7c4dff, #c837e0);
+      transform: translateY(-1px);
+    }
+    
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn:disabled {
+      background: linear-gradient(to right, #6b4cb6, #a936af);
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    .btn-submit {
+      margin-top: 10px;
+      height: 48px;
+      font-size: 16px;
+    }
+ 
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      animation: spin 1s linear infinite;
+      display: none;
+    }
+
+    .btn:disabled .spinner {
+      display: inline-block;
+    }
+    
+    .image-preview-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+    
+    .image-preview {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid rgba(80, 80, 100, 0.8);
+    }
+    
+    .image-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .remove-image {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      background-color: rgba(220, 38, 38, 0.8);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    
+    .image-preview:hover .remove-image {
+      opacity: 1;
+    }
+    
+    .file-upload {
+      border: 2px dashed rgba(80, 80, 100, 0.8);
+      border-radius: 8px;
+      padding: 10px; /* Компактные отступы */
+      text-align: center;
+      cursor: pointer;
+      background-color: rgba(30, 30, 45, 0.3);
+      transition: background-color 0.2s;
+      min-height: 70px; /* Для двух строк */
+    }
+    
+    .file-upload:hover {
+      background-color: rgba(30, 30, 45, 0.6);
+    }
+    
+    .file-upload p {
+      margin: 5px 0 0;
+      font-size: 14px;
+      color: #ccc;
+    }
+    
+    .file-upload strong {
+      color: #ddd;
+    }
+    
+    .file-upload small {
+      display: block;
+      margin-top: 5px;
+      color: #999;
+      font-size: 12px;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    .icon {
+      width: 16px;
+      height: 16px;
+    }
+    
+    @media (max-width: 480px) {
+      .input-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .image-preview-container {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <form id="claim-form" enctype="multipart/form-data">
+      <!-- Photo upload -->
+      <div class="form-group">
+        <label>
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
+          Фото (одне або кілька)
+        </label>
+        
+        <label for="photo-upload" class="file-upload" id="drop-area">
+          <svg class="icon" style="width: 32px; height: 32px; margin: 0 auto; display: block; color: #aaa;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+            <polyline points="21 15 16 10 5 21"></polyline>
+          </svg>
+          <p><strong>Клікніть для завантаження</strong> або перетягніть файли сюди</p>
+          <small>HEIC, PNG, JPG (макс. 5 МБ)</small>
+          <input type="file" id="photo-upload" name="photo-upload[]" multiple accept="image/heic,image/heif,image/png,image/jpeg" style="display: none;">
+        </label>
+        
+        <div class="image-preview-container" id="image-preview-container"></div>
+      </div>
+      
+      <!-- Кнопка отправки -->
+      <button type="submit" class="btn btn-submit" id="submit-btn">
+        Завантажити фото
+        <svg class="spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12a9 9 0 11-6.22-8.66"/>
+        </svg>
+      </button>
+    </form>
+  </div>
+
+  <!-- Подключаем heic2any -->
+  <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const photoUpload = document.getElementById('photo-upload');
+      const dropArea = document.getElementById('drop-area');
+      const imagePreviewContainer = document.getElementById('image-preview-container');
+      const claimForm = document.getElementById('claim-form');
+      const submitBtn = document.getElementById('submit-btn');
+      let selectedFiles = [];
+
+      photoUpload.addEventListener('change', event => handleFiles(event.target.files));
+      dropArea.addEventListener('dragover', event => {
+        event.preventDefault();
+        dropArea.style.backgroundColor = '#888';
+      });
+      dropArea.addEventListener('dragleave', () => {
+        dropArea.style.backgroundColor = '';
+      });
+      dropArea.addEventListener('drop', event => {
+        event.preventDefault();
+        dropArea.style.backgroundColor = '';
+        handleFiles(event.dataTransfer.files);
+      });
+
+      async function handleFiles(files) {
+        const validFiles = Array.from(files).filter(file => 
+          file.type === 'image/heic' || 
+          file.type === 'image/heif' || 
+          file.type === 'image/jpeg' || 
+          file.type === 'image/png'
+        );
+
+        submitBtn.disabled = true;
+        submitBtn.childNodes[0].textContent = 'Конвертування...';
+
+        for (const file of validFiles) {
+          if (file.type === 'image/heic' || file.type === 'image/heif') {
+            try {
+              const convertedBlob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.8 });
+              const convertedFile = new File([convertedBlob], file.name.replace(/\.(heic|heif)$/i, '.jpg'), {
+                type: 'image/jpeg'
+              });
+              await processFile(convertedFile);
+            } catch (error) {
+              console.error('Помилка конвертації HEIC:', error);
+              alert('Не вдалося обробити файл: ' + file.name);
+            }
+          } else {
+            await processFile(file);
+          }
+        }
+
+        submitBtn.disabled = false;
+        submitBtn.childNodes[0].textContent = 'Завантажити фото';
+      }
+
+      async function processFile(file) {
+        if (file.size > 5 * 1024 * 1024) {
+          return new Promise(resolve => {
+            compressImage(file, compressedFile => {
+              selectedFiles.push(compressedFile);
+              updateImagePreviews();
+              resolve();
+            });
+          });
+        } else {
+          selectedFiles.push(file);
+          updateImagePreviews();
+        }
+      }
+
+      function updateImagePreviews() {
+        imagePreviewContainer.innerHTML = '';
+        
+        selectedFiles.forEach((file, index) => {
+          const previewDiv = document.createElement('div');
+          previewDiv.className = 'image-preview';
+          
+          const img = document.createElement('img');
+          img.src = URL.createObjectURL(file);
+          previewDiv.appendChild(img);
+          
+          const removeBtn = document.createElement('button');
+          removeBtn.className = 'remove-image';
+          removeBtn.innerHTML = '×';
+          removeBtn.addEventListener('click', () => {
+            selectedFiles.splice(index, 1);
+            updateImagePreviews();
+          });
+          
+          previewDiv.appendChild(removeBtn);
+          imagePreviewContainer.appendChild(previewDiv);
+        });
+
+        // Обновляем input для отправки
+        const dataTransfer = new DataTransfer();
+        selectedFiles.forEach(file => dataTransfer.items.add(file));
+        photoUpload.files = dataTransfer.files;
+      }
+
+      function compressImage(file, callback) {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function(event) {
+          const img = new Image();
+          img.src = event.target.result;
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const scale = Math.min(800 / img.width, 800 / img.height);
+            canvas.width = img.width * scale;
+            canvas.height = img.height * scale;
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            canvas.toBlob(blob => callback(new File([blob], file.name, { type: 'image/jpeg' })), 'image/jpeg', 0.8);
+          };
+        };
+      }
+
+      // Обработчик отправки формы
+      claimForm.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        
+        if (selectedFiles.length === 0) {
+          alert('Будь ласка, виберіть файли для завантаження.');
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.childNodes[0].textContent = 'Завантаження...';
+
+        const formData = new FormData(claimForm);
+
+        try {
+          const response = await fetch('upload.php', {
+            method: 'POST',
+            body: formData
+          });
+          const data = await response.json();
+          console.log('Success:', data);
+          alert(data.message);
+          if (data.success) {
+            selectedFiles = [];
+            photoUpload.value = '';
+            updateImagePreviews();
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Помилка завантаження файлів.');
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.childNodes[0].textContent = 'Завантажити фото';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
