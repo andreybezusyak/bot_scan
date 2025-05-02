@@ -1,45 +1,41 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Telegram Web App Fullscreen</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Telegram WebApp</title>
   <style>
-    body, html {
+    html, body {
       margin: 0;
       padding: 0;
       height: 100%;
-      width: 100%;
-      background: #f2f2f2;
+      background: #f0f0f0;
       font-family: sans-serif;
       display: flex;
-      justify-content: center;
       align-items: center;
-    }
-
-    h1 {
-      color: #333;
+      justify-content: center;
     }
   </style>
 </head>
 <body>
   <h1 id="title">Загрузка...</h1>
 
-<script>
-  window.addEventListener("DOMContentLoaded", () => {
-    const titleEl = document.getElementById("title");
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      const titleEl = document.getElementById("title");
 
-    if (window.Telegram && Telegram.WebApp && Telegram.WebApp.initData) {
-      let tg = Telegram.WebApp;
-      tg.ready();
-      tg.expand();
-      tg.requestFullscreen();
+      if (window.Telegram && Telegram.WebApp && typeof Telegram.WebApp.expand === 'function') {
+        const tg = Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+        tg.requestFullscreen?.();
 
-      titleEl.textContent = "Telegram WebApp успешно открыт!";
-    } else {
-      titleEl.textContent = "Открыто вне Telegram";
-    }
-  });
-</script>
+        titleEl.textContent = "✅ Telegram WebApp успешно открыт!";
+        console.log("Telegram.WebApp:", tg);
+      } else {
+        titleEl.textContent = "⚠️ Открыто вне Telegram";
+      }
+    });
+  </script>
 </body>
 </html>
