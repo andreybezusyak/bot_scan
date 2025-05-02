@@ -12,15 +12,15 @@
     window.addEventListener("DOMContentLoaded", () => {
       console.log("✅ DOM загружен");
       const titleEl = document.getElementById("title");
-      titleEl.textContent === "Завантаження..."
+      titleEl.textContent = "Завантаження..."
 
       if (window.Telegram && Telegram.WebApp) {
         console.log("✅ Telegram WebApp доступен");
-        titleEl.textContent === "✅ Telegram WebApp доступен"
+        titleEl.textContent = "✅ Telegram WebApp доступен"
         Telegram.WebApp.ready();
       } else {
         console.log("❌ Telegram WebApp не доступен");
-        titleEl.textContent === ❌ Telegram WebApp не доступен"
+        titleEl.textContent = ❌ Telegram WebApp не доступен"
       }
     });
   </script>
