@@ -21,28 +21,41 @@
       color: #333;
     }
   </style>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://telegram.org/js/telegram-web-app.js" onload="initWebApp()" onerror="handleScriptError()"></script>
 </head>
 <body>
   <h1 id="title">Завантаження...</h1>
 
   <script>
-    window.addEventListener("DOMContentLoaded", () => {
+    function initWebApp() {
+      console.log("telegram-web-app.js загружен");
       const titleEl = document.getElementById("title");
 
-      if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData) {
-        const tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand(); // Разворачиваем Mini App на весь экран
-        tg.setHeaderColor('transparent'); // Скрываем шапку
-        tg.setBackgroundColor('#f0f0f0'); // Синхронизируем фон
+      try {
+        if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.isVersionAtLeast('6.0')) {
+          const tg = window.Telegram.WebApp;
+          tg.ready();
+          tg.expand(); // Разворачиваем Mini App на весь экран
+          tg.setHeaderColor('transparent'); // Скрываем шапку
+          tg.setBackgroundColor('#f0f0f0'); // Синхронизируем фон
 
-        titleEl.textContent = "✅ Telegram WebApp успішно відкрито!";
-        console.log("Telegram.WebApp:", tg);
-      } else {
-        titleEl.textContent = "⚠️ Відкрито поза Telegram";
+          titleEl.textContent = "✅ Telegram WebApp успішно відкрито!";
+          console.log("Telegram.WebApp:", tg);
+        } else {
+          titleEl.textContent = "⚠️ Відкрито поза Telegram";
+          console.log("Не обнаружен Telegram WebApp");
+        }
+      } catch (e) {
+        titleEl.textContent = "⚠️ Помилка ініціалізації";
+        console.error("Ошибка:", e);
       }
-    });
+    }
+
+    function handleScriptError() {
+      const titleEl = document.getElementById("title");
+      titleEl.textContent = "⚠️ Помилка завантаження скрипта";
+      console.error("Не удалось загрузить telegram-web-app.js");
+    }
   </script>
 </body>
 </html>
