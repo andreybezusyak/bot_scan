@@ -21,12 +21,21 @@
       color: #333;
     }
   </style>
-  <script src="https://telegram.org/js/telegram-web-app.js" onload="initWebApp()" onerror="handleScriptError()"></script>
 </head>
 <body>
   <h1 id="title">Завантаження...</h1>
 
   <script>
+    // Резервный таймер для обработки случаев, когда скрипт не загружается
+    setTimeout(() => {
+      const titleEl = document.getElementById("title");
+      if (titleEl.textContent === "Завантаження...") {
+        titleEl.textContent = "⚠️ Відкрито поза Telegram";
+        console.log("Таймер: Telegram WebApp не инициализирован");
+      }
+    }, 3000); // 3 секунды
+
+    // Функция инициализации
     function initWebApp() {
       console.log("telegram-web-app.js загружен");
       const titleEl = document.getElementById("title");
@@ -51,11 +60,13 @@
       }
     }
 
+    // Функция обработки ошибки загрузки скрипта
     function handleScriptError() {
       const titleEl = document.getElementById("title");
-      titleEl.textContent = "⚠️ Помилка завантаження скрипта";
+      titleEl.textContent = "⚠️ Відкрито поза Telegram";
       console.error("Не удалось загрузить telegram-web-app.js");
     }
   </script>
+  <script defer src="https://telegram.org/js/telegram-web-app.js" onload="initWebApp()" onerror="handleScriptError()"></script>
 </body>
 </html>
