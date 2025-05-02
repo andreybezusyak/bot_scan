@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Telegram Web App Fullscreen</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      background: #f2f2f2;
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    h1 {
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <h1>Приложение Telegram на весь экран</h1>
+
+  <script>
+    window.addEventListener("DOMContentLoaded", () => {
+      if (window.Telegram && Telegram.WebApp) {
+        let tg = window.Telegram.WebApp;
+        tg.ready();              // Уведомляем Telegram, что WebApp готов
+        tg.expand();             // Рекомендуется для развертывания
+        tg.requestFullscreen();  // Переход в полноэкранный режим
+      }
+    });
+  </script>
+</body>
+</html>
