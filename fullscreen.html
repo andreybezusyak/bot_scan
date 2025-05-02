@@ -23,24 +23,23 @@
   </style>
 </head>
 <body>
-  <h1>Приложение Telegram на весь экран !</h1>
+  <h1 id="title">Загрузка...</h1>
 
-  <script>
-    window.addEventListener("DOMContentLoaded", () => {
-      const titleEl = document.getElementById("title");
-  
-      if (window.Telegram && Telegram.WebApp) {
-        let tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
-        tg.requestFullscreen();
-  
-        // Меняем текст после успешной инициализации
-        titleEl.textContent = "Telegram WebApp успешно открыт!";
-      } else {
-        titleEl.textContent = "Telegram WebApp не поддерживается.";
-      }
-    });
-  </script>
+<script>
+  window.addEventListener("DOMContentLoaded", () => {
+    const titleEl = document.getElementById("title");
+
+    if (window.Telegram && Telegram.WebApp && Telegram.WebApp.initData) {
+      let tg = Telegram.WebApp;
+      tg.ready();
+      tg.expand();
+      tg.requestFullscreen();
+
+      titleEl.textContent = "Telegram WebApp успешно открыт!";
+    } else {
+      titleEl.textContent = "Открыто вне Telegram";
+    }
+  });
+</script>
 </body>
 </html>
