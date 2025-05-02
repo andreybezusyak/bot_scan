@@ -2,7 +2,7 @@
 <html lang="uk">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Telegram WebApp</title>
   <style>
     html, body {
@@ -14,26 +14,33 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      overflow: hidden;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
     }
   </style>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-  <h1 id="title">Загрузка...</h1>
+  <h1 id="title">Завантаження...</h1>
 
   <script>
     window.addEventListener("DOMContentLoaded", () => {
       const titleEl = document.getElementById("title");
 
-      if (window.Telegram && Telegram.WebApp && typeof Telegram.WebApp.expand === 'function') {
-        const tg = Telegram.WebApp;
+      if (window.Telegram && window.Telegram.WebApp) {
+        const tg = window.Telegram.WebApp;
         tg.ready();
-        tg.expand();
-        tg.requestFullscreen?.();
+        tg.expand(); // Разворачиваем Mini App на весь экран
+        tg.setHeaderColor('transparent'); // Скрываем шапку
+        tg.setBackgroundColor('#f0f0f0'); // Синхронизируем фон
 
-        titleEl.textContent = "✅ Telegram WebApp успешно открыт!";
+        titleEl.textContent = "✅ Telegram WebApp успішно відкрито!";
         console.log("Telegram.WebApp:", tg);
       } else {
-        titleEl.textContent = "⚠️ Открыто вне Telegram";
+        titleEl.textContent = "⚠️ Відкрито поза Telegram";
       }
     });
   </script>
