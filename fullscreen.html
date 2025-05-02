@@ -2,71 +2,23 @@
 <html lang="uk">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Telegram WebApp</title>
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      background: #f0f0f0;
-      font-family: sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-    h1 {
-      text-align: center;
-      color: #333;
-    }
-  </style>
 </head>
 <body>
-  <h1 id="title">Завантаження...</h1>
+  <h1>Telegram Mini App</h1>
 
   <script>
-    // Резервный таймер для обработки случаев, когда скрипт не загружается
-    setTimeout(() => {
-      const titleEl = document.getElementById("title");
-      if (titleEl.textContent === "Завантаження...") {
-        titleEl.textContent = "⚠️ Відкрито поза Telegram";
-        console.log("Таймер: Telegram WebApp не инициализирован");
+    window.addEventListener("DOMContentLoaded", () => {
+      console.log("✅ DOM загружен");
+
+      if (window.Telegram && Telegram.WebApp) {
+        console.log("✅ Telegram WebApp доступен");
+        Telegram.WebApp.ready();
+      } else {
+        console.log("❌ Telegram WebApp не доступен");
       }
-    }, 3000); // 3 секунды
-
-    // Функция инициализации
-    function initWebApp() {
-      console.log("telegram-web-app.js загружен");
-      const titleEl = document.getElementById("title");
-
-      try {
-        if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe) {
-          const tg = window.Telegram.WebApp;
-          tg.ready();
-          tg.expand(); // Разворачиваем Mini App на весь экран
-          tg.setHeaderColor('transparent'); // Скрываем шапку
-          tg.setBackgroundColor('#f0f0f0'); // Синхронизируем фон
-
-          titleEl.textContent = "✅ Telegram WebApp успішно відкрито!";
-          console.log("Telegram.WebApp:", tg, "initDataUnsafe:", tg.initDataUnsafe);
-        } else {
-          titleEl.textContent = "⚠️ Відкрито поза Telegram";
-          console.log("Не обнаружен Telegram WebApp или initDataUnsafe");
-        }
-      } catch (e) {
-        titleEl.textContent = "⚠️ Відкрито поза Telegram";
-        console.error("Ошибка инициализации:", e);
-      }
-    }
-
-    // Функция обработки ошибки загрузки скрипта
-    function handleScriptError() {
-      const titleEl = document.getElementById("title");
-      titleEl.textContent = "⚠️ Відкрито поза Telegram";
-      console.error("Не удалось загрузить telegram-web-app.js");
-    }
+    });
   </script>
-  <script defer src="https://telegram.org/js/telegram-web-app.js" onload="initWebApp()" onerror="handleScriptError()"></script>
 </body>
 </html>
