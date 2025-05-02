@@ -30,7 +30,7 @@
     window.addEventListener("DOMContentLoaded", () => {
       const titleEl = document.getElementById("title");
 
-      if (window.Telegram && window.Telegram.WebApp) {
+      if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData) {
         const tg = window.Telegram.WebApp;
         tg.ready();
         tg.expand(); // Разворачиваем Mini App на весь экран
