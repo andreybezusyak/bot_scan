@@ -27,11 +27,18 @@
 
   <script>
     window.addEventListener("DOMContentLoaded", () => {
+      const titleEl = document.getElementById("title");
+  
       if (window.Telegram && Telegram.WebApp) {
         let tg = window.Telegram.WebApp;
-        tg.ready();              // Уведомляем Telegram, что WebApp готов
-        tg.expand();             // Рекомендуется для развертывания
-        tg.requestFullscreen();  // Переход в полноэкранный режим
+        tg.ready();
+        tg.expand();
+        tg.requestFullscreen();
+  
+        // Меняем текст после успешной инициализации
+        titleEl.textContent = "Telegram WebApp успешно открыт!";
+      } else {
+        titleEl.textContent = "Telegram WebApp не поддерживается.";
       }
     });
   </script>
