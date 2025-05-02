@@ -41,7 +41,7 @@
       const titleEl = document.getElementById("title");
 
       try {
-        if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.isVersionAtLeast('6.0')) {
+        if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe) {
           const tg = window.Telegram.WebApp;
           tg.ready();
           tg.expand(); // Разворачиваем Mini App на весь экран
@@ -49,14 +49,14 @@
           tg.setBackgroundColor('#f0f0f0'); // Синхронизируем фон
 
           titleEl.textContent = "✅ Telegram WebApp успішно відкрито!";
-          console.log("Telegram.WebApp:", tg);
+          console.log("Telegram.WebApp:", tg, "initDataUnsafe:", tg.initDataUnsafe);
         } else {
           titleEl.textContent = "⚠️ Відкрито поза Telegram";
-          console.log("Не обнаружен Telegram WebApp");
+          console.log("Не обнаружен Telegram WebApp или initDataUnsafe");
         }
       } catch (e) {
-        titleEl.textContent = "⚠️ Помилка ініціалізації";
-        console.error("Ошибка:", e);
+        titleEl.textContent = "⚠️ Відкрито поза Telegram";
+        console.error("Ошибка инициализации:", e);
       }
     }
 
