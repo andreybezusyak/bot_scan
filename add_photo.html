@@ -420,7 +420,7 @@
           }
         } catch (error) {
           console.error('Error:', error);
-          alert('Помилка завантаження файлів.');
+          alert(error);
         } finally {
           submitBtn.disabled = false;
           submitBtn.childNodes[0].textContent = 'Завантажити фото';
