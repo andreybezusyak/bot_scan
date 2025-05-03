@@ -6,6 +6,8 @@
   <title>Форма рекламації</title>
   <!-- Add Quagga.js for barcode scanning -->
   <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -74,7 +76,7 @@
     }
     
     textarea {
-      min-height: 120px;
+      min-height: 20px;
       resize: vertical;
     }
     
@@ -177,6 +179,29 @@
       display: flex;
       gap: 10px;
       margin-top: 10px;
+      justify-content: center;
+    }
+    
+    .button-container .btn {
+      width: 48px;
+      height: 48px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+    }
+    
+    .button-container .btn:hover {
+      transform: scale(1.1);
+    }
+    
+    .button-container #stop-camera {
+      background: rgba(80, 80, 100, 0.8);
+    }
+    
+    .button-container .btn svg {
+      flex-shrink: 0;
     }
     
     .image-preview-container {
@@ -226,7 +251,7 @@
     .file-upload {
       border: 2px dashed rgba(80, 80, 100, 0.8);
       border-radius: 8px;
-      padding: 20px;
+      padding: 10px;
       text-align: center;
       cursor: pointer;
       background-color: rgba(30, 30, 45, 0.3);
@@ -238,7 +263,7 @@
     }
     
     .file-upload p {
-      margin: 10px 0 0;
+      margin: 5px 0 0;
       font-size: 14px;
       color: #ccc;
     }
@@ -261,6 +286,11 @@
     .icon {
       width: 16px;
       height: 16px;
+    }
+
+    .large-icon {
+      width: 24px;
+      height: 24px;
     }
     
     @media (max-width: 480px) {
@@ -287,6 +317,39 @@
       position: absolute;
       top: 0;
       left: 0;
+    }
+
+    @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+    }
+
+    /* Spinner styles */
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      animation: spin 1s linear infinite;
+      display: none;
+    }
+
+    .btn:disabled .spinner {
+      display: inline-block;
+    }
+
+    .barcode-success {
+      animation: barcodeGlow 1.5s ease-out;
+    }
+
+    @keyframes barcodeGlow {
+      0% {
+        border-color: #10b981;
+        box-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
+      }
+      100% {
+        border-color: rgba(80, 80, 100, 0.8);
+        box-shadow: none;
+      }
     }
   </style>
 </head>
@@ -318,14 +381,49 @@
       </div>
       
       <div class="button-container hidden" id="camera-controls">
-        <button type="button" class="btn" style="background: rgba(80, 80, 100, 0.8);" id="stop-camera">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
+        <!-- Zoom In (Лупа с "+") -->
+        <!-- <button type="button" class="btn" id="zoom-in" title="Збільшити зум">
+          <svg class="icon large-icon" viewBox="0 0 24 24" fill="none">
+            <defs>
+              <linearGradient id="zoomInGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#d1e3ff;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#a3c1ff;stop-opacity:1" />
+              </linearGradient>
+            </defs>
+            <circle cx="12" cy="12" r="8" fill="url(#zoomInGradient)" stroke="#ffffff" stroke-width="2"/>
+            <path d="M14 12H10M12 10v4" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+            <path d="M16 16l4 4" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
           </svg>
-          Зупинити камеру
+        </button> -->
+        <!-- Zoom Out (Лупа с "−") -->
+        <!-- <button type="button" class="btn" id="zoom-out" title="Зменшити зум">
+          <svg class="icon large-icon" viewBox="0 0 24 24" fill="none">
+            <defs>
+              <linearGradient id="zoomOutGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#d1e3ff;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#a3c1ff;stop-opacity:1" />
+              </linearGradient>
+            </defs>
+            <circle cx="12" cy="12" r="8" fill="url(#zoomOutGradient)" stroke="#ffffff" stroke-width="2"/>
+            <path d="M14 12H10" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+            <path d="M16 16l4 4" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button> -->
+        <!-- Stop Camera (Камера с красной линией) -->
+        <button type="button" class="btn" style="background: rgba(80, 80, 100, 0.8);" id="stop-camera" title="Зупинити камеру">
+          <svg class="icon large-icon" viewBox="0 0 24 24" fill="none">
+            <defs>
+              <linearGradient id="cameraGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#b0b0b0;stop-opacity:1" />
+              </linearGradient>
+            </defs>
+            <rect x="4" y="6" width="16" height="12" rx="2" fill="url(#cameraGradient)"/>
+            <circle cx="12" cy="12" r="3" fill="none" stroke="#000000" stroke-width="1.5"/>
+            <path d="M20 9l3-3v12l-3-3" fill="url(#cameraGradient)"/>
+            <path d="M4 4l16 16" stroke="#ff0000" stroke-width="2" stroke-linecap="round"/>
+          </svg>
         </button>
-        
       </div>
       
       <!-- Barcode field -->
@@ -384,7 +482,7 @@
           </svg>
           Опис проблеми
         </label>
-        <textarea id="description" name="description" placeholder="Детально опишіть проблему, що виникла..." required></textarea>
+        <textarea id="description" name="description" rows="3" placeholder="Детально опишіть проблему, що виникла..." required></textarea>
       </div>
       
 
@@ -407,8 +505,8 @@
             <polyline points="21 15 16 10 5 21"></polyline>
           </svg>
           <p><strong>Клікніть для завантаження</strong> або перетягніть файли сюди</p>
-          <small>PNG, JPG або JPEG (макс. 5 МБ)</small>
-          <input type="file" id="photo-upload" multiple accept="image/*" style="display: none;">
+          <small>HEIC, PNG, JPG (макс. 5 МБ)</small>
+          <input type="file" id="photo-upload" name="photo-upload[]" multiple accept="image/heic,image/heif,image/png,image/jpeg" style="display: none;">
         </label>
         
         <div class="image-preview-container" id="image-preview-container"></div>
@@ -417,9 +515,8 @@
       <!-- Submit button -->
       <button type="submit" class="btn btn-submit" id="submit-btn">
         Відправити рекламацію
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="5" y1="12" x2="19" y2="12"></line>
-          <polyline points="12 5 19 12 12 19"></polyline>
+        <svg class="spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12a9 9 0 11-6.22-8.66"/>
         </svg>
       </button>
     </form>
@@ -427,9 +524,23 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+      if (window.Telegram && Telegram.WebApp) {
+        let tg = window.Telegram.WebApp;
+        tg.ready();              // Уведомляем Telegram, что WebApp готов
+        tg.expand();             // Рекомендуется для развертывания
+        tg.requestFullscreen();  // Переход в полноэкранный режим
+      
+
+                  // for testing purposes
+                  document.getElementById('barcode').value = '87492783';
+                  document.getElementById('client').value = 'Козюра Вікторія Володимирівна';
+                  document.getElementById('phone').value = '+380678832848';
+                  document.getElementById('storeId').value = '3229';                  
+                  document.getElementById('description').value = 'Відломані дверцята';
+      }
+
       const scanBarcodeBtn = document.getElementById('scan-barcode');
       const stopCameraBtn = document.getElementById('stop-camera');
-      // const simulateScanBtn = document.getElementById('simulate-scan');
       const videoContainer = document.getElementById('video-container');
       const cameraControls = document.getElementById('camera-controls');
       const barcodeInput = document.getElementById('barcode');
@@ -442,8 +553,27 @@
       let isVideoActive = false;
       let isQuaggaInitialized = false;
       let selectedFiles = [];
+
+      function playBeep() {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = ctx.createOscillator();
+        const gainNode = ctx.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(ctx.destination);
+
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(800, ctx.currentTime);
+        gainNode.gain.setValueAtTime(0.5, ctx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+
+        oscillator.start();
+        oscillator.stop(ctx.currentTime + 0.3);
+      }
+      function showToast(message, type) {
+        alert(message);
+      }
       
-      // Function to initialize Quagga
       function initQuagga() {
         if (isQuaggaInitialized) {
           return;
@@ -500,19 +630,47 @@
               const code = result.codeResult.code;
               console.log("Barcode detected:", result.codeResult);
               
-              // Set barcode value
               barcodeInput.value = code;
-              
-              // Show success message
+              playBeep();
+              barcodeInput.classList.add('barcode-success');
+              setTimeout(() => {
+                barcodeInput.classList.remove('barcode-success');
+              }, 1500);
               showToast(`Штрихкод знайдено: ${code}`, 'success');
-              
-              // Stop scanning
               stopScanning();
             }
           });
         });
       }
-      
+      let currentZoom = 5.0;
+      const zoomStep = 0.5;
+      const minZoom = 1.0;
+      const maxZoom = 5.0;
+
+      function applyZoom(track, zoomLevel) {
+        if (track && typeof track.applyConstraints === 'function') {
+          track.applyConstraints({
+            advanced: [{ zoom: zoomLevel }]
+          }).then(() => {
+            console.log(`Зум установлен на: ${zoomLevel}`);
+          }).catch(err => {
+            console.error('Ошибка при установке зума:', err);
+            showToast('Не вдалося змінити зум', 'error');
+          });
+        }
+      }
+      function getVideoTrack() {
+        const videoElement = document.querySelector('#interactive video');
+        if (videoElement && videoElement.srcObject) {
+          const stream = videoElement.srcObject;
+          return stream.getVideoTracks()[0];
+        }
+        return null;
+      }
+ 
+
+
+
       // Function to start/stop barcode scanning
       const startScanning = () => {
         if (!isVideoActive) {
@@ -529,65 +687,7 @@
         videoContainer.style.display = 'none';
         cameraControls.classList.add('hidden');
       };
-      
-      // Show toast message
-      function showToast(message, type = 'info') {
-        const toast = document.createElement('div');
-        toast.style.position = 'fixed';
-        toast.style.bottom = '20px';
-        toast.style.left = '50%';
-        toast.style.transform = 'translateX(-50%)';
-        toast.style.padding = '12px 20px';
-        toast.style.color = 'white';
-        toast.style.borderRadius = '8px';
-        toast.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.2)';
-        toast.style.zIndex = '1000';
-        toast.style.display = 'flex';
-        toast.style.alignItems = 'center';
-        toast.style.gap = '8px';
-        toast.style.fontSize = '14px';
-        
-        // Set background color based on type
-        if (type === 'success') {
-          toast.style.background = 'rgba(34, 197, 94, 0.9)';
-          toast.innerHTML = `
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-            ${message}
-          `;
-        } else if (type === 'error') {
-          toast.style.background = 'rgba(220, 38, 38, 0.9)';
-          toast.innerHTML = `
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-            ${message}
-          `;
-        } else {
-          toast.style.background = 'rgba(79, 70, 229, 0.9)';
-          toast.innerHTML = `
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="8" x2="12" y2="12"></line>
-              <line x1="12" y1="16" x2="12.01" y2="16"></line>
-            </svg>
-            ${message}
-          `;
-        }
-        
-        document.body.appendChild(toast);
-        
-        setTimeout(() => {
-          toast.style.opacity = '0';
-          toast.style.transition = 'opacity 0.5s';
-          setTimeout(() => {
-            document.body.removeChild(toast);
-          }, 500);
-        }, 3000);
-      }
-      
+
       // Scan barcode button event listener
       scanBarcodeBtn.addEventListener('click', startScanning);
       
@@ -609,22 +709,81 @@
         dropArea.style.backgroundColor = '';
         handleFiles(event.dataTransfer.files);
       });
-      function handleFiles(files) {
-        const validFiles = Array.from(files).filter(file => file.type === 'image/jpeg' || file.type === 'image/png');
-        validFiles.forEach(file => {
-          if (file.size > 5 * 1024 * 1024) {
+  
+      async function handleFiles(files) {
+        const storeId = document.getElementById('storeId').value.trim();
+        const barcode = document.getElementById('barcode').value.trim();
+        
+        if (!storeId || !barcode) {
+          alert('Будь ласка, заповніть поля ID магазину та штрих-код перед завантаженням файлів.');
+          return;
+        }
+        
+        const validFiles = Array.from(files).filter(file => 
+          file.type === 'image/heic' || 
+          file.type === 'image/heif' || 
+          file.type === 'image/jpeg' || 
+          file.type === 'image/png'
+        );
+
+        submitBtn.disabled = true;
+        submitBtn.childNodes[0].textContent = 'Конвертування...';
+
+        for (const file of validFiles) {
+          if (file.type === 'image/heic' || file.type === 'image/heif') {
+            try {
+              const convertedBlob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.8 });
+              const convertedFile = new File([convertedBlob], file.name.replace(/\.(heic|heif)$/i, '.jpg'), {
+                type: 'image/jpeg'
+              });
+              await processFile(convertedFile);
+            } catch (error) {
+              console.error('Помилка конвертації HEIC:', error);
+              alert('Не вдалося обробити файл: ' + file.name);
+            }
+          } else {
+            await processFile(file);
+          }
+        }
+
+        submitBtn.disabled = false;
+        submitBtn.childNodes[0].textContent = 'Відправити рекламацію';
+      }
+      async function processFile(file) {
+        if (file.size > 5 * 1024 * 1024) {
+          return new Promise(resolve => {
             compressImage(file, compressedFile => {
               selectedFiles.push(compressedFile);
               updateImagePreviews();
+              resolve();
             });
-          } else {
-            selectedFiles.push(file);
-            updateImagePreviews();
-          }
-        });
+          });
+        } else {
+          selectedFiles.push(file);
+          updateImagePreviews();
+        }
       }
       function updateImagePreviews() {
         imagePreviewContainer.innerHTML = '';
+        
+        const storeId = document.getElementById('storeId').value.trim();
+        const barcode = document.getElementById('barcode').value.trim();
+        
+        const today = new Date();
+        const day = String(today.getDate()).padStart(2, '0');
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const year = String(today.getFullYear()).slice(-2);
+        const dateStr = `${day}${month}${year}`;
+        
+        if (!storeId || !barcode) {
+          alert('Будь ласка, заповніть поля ID магазину та штрих-код.');
+          return;
+        }
+        
+        const renamedFiles = selectedFiles.map((file, index) => {
+          const newFileName = `${storeId}_${dateStr}_${barcode}_${index + 1}.jpg`;
+          return new File([file], newFileName, { type: file.type });
+        });
         
         selectedFiles.forEach((file, index) => {
           const previewDiv = document.createElement('div');
@@ -645,6 +804,10 @@
           previewDiv.appendChild(removeBtn);
           imagePreviewContainer.appendChild(previewDiv);
         });
+        
+        const dataTransfer = new DataTransfer();
+        renamedFiles.forEach(file => dataTransfer.items.add(file));
+        photoUpload.files = dataTransfer.files;
       }
       function compressImage(file, callback) {
         const reader = new FileReader();
@@ -663,122 +826,59 @@
           };
         };
       }
-    
       
-      
-      // Form submission
-      claimForm.addEventListener('submit', event => {
+      claimForm.addEventListener('submit', async function(event) {
         event.preventDefault();
         
-        // Change button state to loading
-        const originalBtnText = submitBtn.innerHTML;
+        if (selectedFiles.length === 0) {
+          alert('Будь ласка, виберіть файли для завантаження.');
+          return;
+        }
+
+
+
         submitBtn.disabled = true;
-        submitBtn.innerHTML = `
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;">
-            <circle cx="12" cy="12" r="10" stroke-opacity="0.25" stroke-width="4"></circle>
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10" stroke-opacity="0.75" stroke-width="4"></path>
-          </svg>
-          Відправка...
-        `;
-        
-        // Add keyframes for loading animation
-        if (!document.getElementById('spin-keyframes')) {
-          const style = document.createElement('style');
-          style.id = 'spin-keyframes';
-          style.textContent = `
-            @keyframes spin {
-              0% { transform: rotate(0deg); }
-              100% { transform: rotate(360deg); }
-            }
-          `;
-          document.head.appendChild(style);
-        }
-        
-        // // Simulate form submission with a delay
-        // setTimeout(() => {
-        //   // Create form data
-        //   const formData = new FormData(claimForm);
-          
-        //   // Add files to form data
-        //   selectedFiles.forEach((file, index) => {
-        //     formData.append(`image-${index}`, file);
-        //   });
-          
-        //   // Log form data (in a real app, you would send this to a server)
-        //   console.log('Form data collected:');
-        //   for (const [key, value] of formData.entries()) {
-        //     console.log(`${key}: ${value instanceof File ? value.name : value}`);
-        //   }
-          
-        //   // Show success message
-        //   showToast('Рекламацію відправлено успішно!', 'success');
-          
-        //   // Reset form and button
-        //   claimForm.reset();
-        //   selectedFiles = [];
-        //   updateImagePreviews();
-        //   submitBtn.disabled = false;
-        //   submitBtn.innerHTML = originalBtnText;
-        // }, 1500);
+        submitBtn.childNodes[0].textContent = 'Завантаження...';
 
-        // Сбор данных формы и отправка в Telegram
-      const dataToSend = {
-        barcode: formData.get('barcode'),
-        client: formData.get('client'),
-        phone: formData.get('phone'),
-        storeId: formData.get('storeId'),
-        description: formData.get('description'),
-        images: []
-      };
+        const formData = new FormData(claimForm);
 
-      // Преобразование изображений в base64
-      const fileReadPromises = selectedFiles.map(file => {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = reject;
-          reader.readAsDataURL(file);
-        });
-      });
-
-      Promise.all(fileReadPromises).then(base64Images => {
-        dataToSend.images = base64Images;
-
-        if (window.Telegram && Telegram.WebApp) {
-          Telegram.WebApp.sendData(JSON.stringify(dataToSend));
-        } else {
-          showToast('Помилка: Telegram WebApp недоступний', 'error');
+        try {
+          const response = await fetch('upload.php', {
+            method: 'POST',
+            body: formData
+          });
+          const data = await response.json();
+          console.log('Success:', data);
+          // alert(data.message);
+          showToast(data.message, 'success');
+          if (data.success) {
+            selectedFiles = [];
+            photoUpload.value = '';
+            updateImagePreviews();
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          alert('Помилка завантаження файлів.');
+          return;
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.childNodes[0].textContent = 'Відправити рекламацію';
         }
 
-        // сброс формы
-        claimForm.reset();
-        selectedFiles = [];
-        updateImagePreviews();
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalBtnText;
+        const formFields = {
+        barcode: document.getElementById('barcode').value.trim(),
+        client: document.getElementById('client').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        storeId: document.getElementById('storeId').value.trim(),
+        description: document.getElementById('description').value.trim()
+        };
 
-        showToast('Дані надіслано у бот!', 'success');
-      }).catch(error => {
-        console.error('Помилка читання зображень:', error);
-        showToast('Помилка при обробці зображень', 'error');
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalBtnText;
-      });
-
-
+        // Отправляем данные в Telegram-бот
+        // Telegram.WebApp.sendData(JSON.stringify(formFields));
 
       });
+
     });
-
-    window.matchMedia("(orientation: landscape)").addEventListener("change", function (e) {
-        if (e.matches) {
-          document.getElementById("scanner-container").requestFullscreen();
-        } else {
-          document.exitFullscreen();
-        }
-    });
-
-
 
   </script>
 </body>
