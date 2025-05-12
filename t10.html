@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Форма рекламації</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body { font-family: Arial, padding: 20px; text-align: center; }
+    button { padding: 10px 20px; background: #0088cc; color: white; border: none; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <div>
+    <h1 id="status">Инициализация...</h1>
+    <button id="send-btn">Отправить тестовые данные</button>
+  </div>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    const statusEl = document.getElementById('status');
+    const sendBtn = document.getElementById('send-btn');
+    
+    // Инициализация
+    tg.expand();
+    tg.ready();
+    statusEl.textContent = "Готово к работе";
+    
+    // Обработчик кнопки
+    sendBtn.addEventListener('click', () => {
+      const testData = {
+        action: "test",
+        timestamp: new Date().toISOString(),
+        random: Math.random()
+      };
+      
+      try {
+        tg.sendData(JSON.stringify(testData));
+        statusEl.textContent = "Данные отправлены!";
+        
+        // Закрыть WebApp через 1 секунду
+        setTimeout(() => tg.close(), 1000);
+      } catch (e) {
+        statusEl.textContent = `Ошибка: ${e.message}`;
+      }
+    });
+  </script>
+</body>
+</html>
