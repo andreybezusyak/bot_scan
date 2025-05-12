@@ -6,43 +6,70 @@
   <title>Форма рекламації</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    body { font-family: Arial, padding: 20px; text-align: center; }
-    button { padding: 10px 20px; background: #0088cc; color: white; border: none; border-radius: 5px; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      text-align: center;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #0088cc;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #006699;
+    }
   </style>
 </head>
 <body>
-  <div>
-    <h1 id="status">Инициализация...</h1>
-    <button id="send-btn">Отправить тестовые данные</button>
+  <div class="container">
+    <form id="claim-form">
+      <h1 id="title">Форма рекламації</h1>
+      <button type="submit" id="submit-btn">
+        Відправити тестові дані
+      </button>
+    </form>
   </div>
 
   <script>
-    const tg = window.Telegram.WebApp;
-    const statusEl = document.getElementById('status');
-    const sendBtn = document.getElementById('send-btn');
-    
-    // Инициализация
-    tg.expand();
-    tg.ready();
-    statusEl.textContent = "Готово к работе";
-    
-    // Обработчик кнопки
-    sendBtn.addEventListener('click', () => {
-      const testData = {
-        action: "test",
-        timestamp: new Date().toISOString(),
-        random: Math.random()
-      };
+    document.addEventListener('DOMContentLoaded', function() {
+      const titleEl = document.getElementById("title");
+      const claimForm = document.getElementById("claim-form");
       
-      try {
-        tg.sendData(JSON.stringify(testData));
-        statusEl.textContent = "Данные отправлены!";
-        
-        // Закрыть WebApp через 1 секунду
-        setTimeout(() => tg.close(), 1000);
-      } catch (e) {
-        statusEl.textContent = `Ошибка: ${e.message}`;
+      // Инициализация Telegram WebApp
+      if (window.Telegram && Telegram.WebApp) {
+        try {
+          const tg = Telegram.WebApp;
+          tg.ready();
+          tg.expand();
+          titleEl.textContent = "Форма готова до використання";
+        } catch (error) {
+          titleEl.textContent = "Помилка: " + error.message;
+        }
+      } else {
+        titleEl.textContent = "Telegram WebApp не доступен";
       }
+
+      // Обработчик отправки формы
+      claimForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const testData = {
+          message: "Тестові дані з WebApp",
+          timestamp: new Date().toISOString()
+        };
+        
+        if (Telegram.WebApp.sendData) {
+          Telegram.WebApp.sendData(JSON.stringify(testData));
+          titleEl.textContent = "Дані відправлено!";
+          Telegram.WebApp.close();
+        } else {
+          titleEl.textContent = "Помилка відправки даних";
+        }
+      });
     });
   </script>
 </body>
